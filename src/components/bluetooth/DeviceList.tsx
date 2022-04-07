@@ -11,59 +11,18 @@ import {
   Item,
   StatusBar
 } from "react-native";
-//import styles from "../../styles/styles";
-import RowDevice from "./RowDevice";
-import IconMaterial from 'react-native-vector-icons/MaterialIcons';
+import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
-
-const DATA = [
-  {
-    id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-    title: "First Item",
-  },
-  {
-    id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-    title: "Second Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29d72",
-    title: "Third Item",
-  },
-  {
-    id: "d7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-    title: "Fourth Item",
-  },
-  {
-    id: "ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-    title: "Fifth Item",
-  },
-  {
-    id: "8694a0f-3da1-471f-bd96-145571e29d72",
-    title: "Sixth Item",
-  },
-  {
-    id: "7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-    title: "Seventh Item",
-  },
-  {
-    id: "c68afc-c605-48d3-a4f8-fbd91aa97f63",
-    title: "Eighth Item",
-  },
-  {
-    id: "694a0f-3da1-471f-bd96-145571e29d72",
-    title: "Ninth Item",
-  },
-];
 
 class DeviceList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       selectedId: null,
-      devices:this.props.devices
+      devices: this.props.devices
     }
-    this.onPress=this.onPress.bind(this)
-    console.log('DEVICES PROPS CONSTRUCTOR',props.devices)
+    this.onPress = this.onPress.bind(this)
+    console.log('DEVICES PROPS CONSTRUCTOR', props.devices)
   }
 
   onPress(item) {
@@ -75,29 +34,29 @@ class DeviceList extends React.Component {
   }
 
   renderItem(item) {
-    const {id, name, paired,connected} = item
-    const { selectedId} = this.state
-    const backgroundColor = item.id === selectedId ? "#6e3b6e" : "#f9c2ff";
-    const color = item.id === selectedId ? 'white' : 'black';
+    const { id, name, paired, connected } = item
+    const { selectedId } = this.state
+    const backgroundColor = item.id === selectedId ? "#5dade2" : "#aed6f1";
+    const color = item.id === selectedId ? 'black' : 'white';
 
 
     return (
-      <TouchableOpacity onPress={() => this.onPress(item)} style={[styles.item, { backgroundColor: backgroundColor }]}>
-        <View  style={styles.container}>
+      <TouchableOpacity onPress={() => this.onPress(item)} style={[styles.item, { backgroundColor }]}>
+        <View style={styles.container}>
           <View style={styles.container_text} >
-            <Text style={styles.title}>
+            <Text style={[styles.title, { color }]}>
               {name}
             </Text>
-            <Text style={styles.description}>
+            <Text style={[styles.description, { color }]}>
               {id}
             </Text>
           </View>
           {paired
-            ? <IconMaterialCommunity name="bluetooth-off" style={styles.photo} color="#FFF" />
-            : <IconMaterialCommunity name="bluetooth-transfer" style={styles.photo} color="#900" />}
+            ? <IconFontAwesome name="bluetooth" style={styles.photo} size={40} color="#229954" />
+            : <IconFontAwesome name="bluetooth-b" style={styles.photo} size={40} color="#e74c3c" />}
           {connected
-            ? <IconMaterial name="bluetooth-disabled" solid style={styles.photo} color="#F0F" />
-            : <IconMaterial name="bluetooth-connected" solid style={styles.photo} color="#900" />}
+            ? <IconMaterialCommunity name="bluetooth-connect" solid style={styles.photo} size={40} color="#229954" />
+            : <IconMaterialCommunity name="bluetooth-off" solid style={styles.photo} size={40} color="#e74c3c" />}
 
         </View>
       </TouchableOpacity>
@@ -105,18 +64,13 @@ class DeviceList extends React.Component {
   };
 
   render() {
-    const {devices}=this.state
+    const { devices } = this.state
     return (
-      <>
-        <ScrollView>
-          <FlatList
-            data={devices}
-            renderItem={({ item }) => this.renderItem(item)}
-            keyExtractor={(item) => item.id}
-          />
-        </ScrollView>
-      </>
-
+      <FlatList
+        data={devices}
+        renderItem={({ item }) => this.renderItem(item)}
+        keyExtractor={(item) => item.id}
+      />
     );
   }
 }
@@ -125,29 +79,42 @@ class DeviceList extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
+    marginTop: 8,
+    flexDirection: 'row',
+    padding: 10,
+    marginLeft: 8,
+    marginRight: 8,
+    marginBottom: 8,
+    elevation: 2,
   },
   item: {
-    padding: 5,
+    padding: 0,
     marginVertical: 4,
     marginHorizontal: 8,
   },
   title: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#F0F',
   },
   container_text: {
     flexDirection: 'column',
     marginLeft: 12,
     justifyContent: 'center',
+    width: '80%'
+  },
+  container_icon: {
+    flexDirection: 'column',
+    marginLeft: 12,
+    justifyContent: 'center',
+    width: '20%'
   },
   description: {
-    fontSize: 11,
+    fontSize: 13,
     fontStyle: 'italic',
   },
   photo: {
-    height: 25,
-    width: 25,
+    height: '100%',
+    width: '10%',
   },
 
 });

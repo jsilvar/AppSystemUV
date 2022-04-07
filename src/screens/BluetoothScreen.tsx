@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 
 import {
     View,
-    Text
+    Text,
+    SafeAreaView
 } from 'react-native'
 
 import BluetoothSerial, {
@@ -165,7 +166,7 @@ class BluetoothScreen extends React.Component {
         const { modalVisible } = this.state
         const [isEnabled, devices] = [true, ConstantTest]
         return (
-            <>
+            <SafeAreaView>
                 <Toast />
 
                 <ModalGeneric
@@ -184,7 +185,7 @@ class BluetoothScreen extends React.Component {
                     onDevicePressed={(id) => this.choiceDevice(id)}
                     onRefresh={this.listDevices}
                 />
-            </>
+            </SafeAreaView>
         )
     }
 }

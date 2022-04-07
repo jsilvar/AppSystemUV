@@ -1,23 +1,23 @@
 import React, { Component } from "react";
 import { Alert, Modal, StyleSheet, Text, Pressable, View } from "react-native";
 
-class ModalGeneric extends React.Component {
+class ModalGeneric extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props)
-    this.state={
+    this.state = {
       modalVisible: false
     }
-    this.onChange=this.onChange.bind(this)
+    this.onChange = this.onChange.bind(this)
   }
 
-  componentDidUpdate(prevProps){
-    if(prevProps.modalVisible!==this.props.modalVisible){
-        console.log('COMPONENT DID UPDATE MODAL GENERIC')
-        console.log('\n UPDATE MODAL GENERIC',)
-        this.setState({
-            modalVisible: this.props.modalVisible 
-        })
+  componentDidUpdate(prevProps) {
+    if (prevProps.modalVisible !== this.props.modalVisible) {
+      console.log('COMPONENT DID UPDATE MODAL GENERIC')
+      console.log('\n UPDATE MODAL GENERIC',)
+      this.setState({
+        modalVisible: this.props.modalVisible
+      })
     }
   }
 
@@ -26,10 +26,10 @@ class ModalGeneric extends React.Component {
     this.onChange(visible)
   }
 
-  onChange(visible){
+  onChange(visible) {
     this.setState({ modalVisible: visible });
     this.props.onChange(visible)
-    console.log('\nMODAL GENERIC',visible)
+    console.log('\nMODAL GENERIC', visible)
   }
 
 
@@ -41,20 +41,36 @@ class ModalGeneric extends React.Component {
           animationType="slide"
           transparent={true}
           visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert("Modal has been closed.");
-            this.setModalVisible(!modalVisible);
-          }}
         >
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <Text style={styles.modalText}>Hello World!</Text>
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => this.setModalVisible(!modalVisible)}
-              >
-                <Text style={styles.textStyle}>Hide Modal</Text>
-              </Pressable>
+              <View style={styles.header}>
+                <Text style={styles.modalText}>ESCOJA UNA OPCIÓN</Text>
+              </View>
+              <View style={styles.body}>
+                <Pressable
+                  style={[styles.button, styles.buttonConnect]}
+                  onPress={() => this.setModalVisible(!modalVisible)}
+                >
+                  <Text style={styles.textStyle}>Conectar</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.button, styles.buttonUnpaired]}
+                  onPress={() => this.setModalVisible(!modalVisible)}
+                >
+                  <Text style={styles.textStyle}>Desvincular</Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.footer}>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => this.setModalVisible(!modalVisible)}
+                >
+                  <Text style={styles.textStyle}>Cerrar</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
         </Modal>
@@ -65,13 +81,19 @@ class ModalGeneric extends React.Component {
 
 const styles = StyleSheet.create({
   centeredView: {
-
+    flex: 1,
+    backgroundColor: "rgba(52,52,52,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
+    flexDirection: 'column',
+    height:'25%',
+    width:'70%',
+    margin: 0,
+    backgroundColor: "red",
+    borderRadius: 5,
+    padding: 0,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -80,27 +102,74 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
   },
   button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2
+    borderRadius: 5,
+    elevation: 2,
+    height:'70%',
+    marginTop:'3%'
   },
-  buttonOpen: {
+  buttonConnect: {
     backgroundColor: "#F194FF",
+    width:'40%',
+    flexDirection:'row',
+    justifyContent:'center',
+    alignCenter:'center',
+  },
+  buttonUnpaired: {
+    backgroundColor: "#F194FF",
+    width:'40%',
+    justifyContent:'center',
+    alignCenter:'center',
   },
   buttonClose: {
     backgroundColor: "#2196F3",
+    width:'80%',
+    textAlign: "center",
+    textAlignVertical:'center',
+    justifyContent:'center',
+    alignCenter:'center',
   },
   textStyle: {
     color: "white",
     fontWeight: "bold",
-    textAlign: "center"
+    textAlign: "center",
+    textAlignVertical:'center'
   },
   modalText: {
-    marginBottom: 15,
-    textAlign: "center"
+    fontSize:20,
+    justifyContent:'center',
+    alignCenter:'center',
+    textAlign: "center",
+    textAlignVertical:'center',
+  },
+  header: {
+    flex:1,
+    backgroundColor:'orange',
+    width:'100%',
+    justifyContent:'center',
+    alignCenter:'center',
+    textAlignVertical:'center'
+  },
+  body: {
+    flex:1,
+    flexDirection:'row',
+    width:'100%',
+    alignItemns: 'center',
+    backgroundColor:'skyblue',
+    justifyContent:'space-evenly',
+    textAlignVertical:'center',
+    alingSelf:'center'
+  },
+  footer: {
+    flexDirection:'row',
+    backgroundColor:'red',
+    width:'100%',
+    alignContent:'center',
+    justifyContent:'center',
+    textAlignVertical:'center',
+    flex:1,
   }
 });
 
