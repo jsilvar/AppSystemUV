@@ -1,46 +1,72 @@
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react';
 import {
     View,
     Text,
-    TextInput,
     Image,
     Button,
     TouchableOpacity,
     StyleSheet
 } from 'react-native';
 
-//config styles bootstrap
-import BootstrapStyleSheet from 'react-native-bootstrap-styles';
+//validation
+import { KEY_RULE_CONSTANT } from '../constants/validator/KeyRuleConstant';
+
 //config keyboard
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 //constants
 import { LOGIN_SCREEN, SPLASH_SCREEN } from '../constants/GlobalConstant';
+import { LoaderGeneric } from '../components/generic/LoaderGeneric';
+import ModalGeneric from '../components/bluetooth/ModalGeneric';
+import { TextInputGeneric } from '../components/generic/TextInputGeneric';
 
-const bootstrapStyleSheet = new BootstrapStyleSheet();
-const { s, c } = bootstrapStyleSheet;
 
-interface Props extends StackScreenProps<any,any>{
+interface Props extends StackScreenProps<any, any> { };
 
-};
+export const LoginScreen = ({ navigation }: Props) => {
 
-export const LoginScreen = ({navigation}:Props) => {
+    const [visible, setVisible] = useState(false)
+    const [validated, setValidated] = useState(0)
+    const [fieldsForm, setFieldsForm] = useState({
+        email: false,
+        password: false
+    })
+    const prevFieldsForm = useRef({ fieldsForm, setFieldsForm })
 
-    const [email, onChangeEmail] = useState('')
-    const [password, onChangePassword] = useState('')
-    const [focus, setFocus] = useState(false);
+    useEffect(() => {
 
-    const onFocus = (id: string) => {
-        console.log('onFocus',id)
-        setFocus(id)
-    }
+        if (prevFieldsForm.fieldsForm !== fieldsForm)
+            console.log('validation use effect login screen', fieldsForm)
 
-    const onBlur = () => {
-        setFocus(null)
-    }
+        return ()=>{
+            prevFieldsForm.fieldsForm=fieldsForm
+            prevFieldsForm.setFieldsForm=setFieldsForm
+        } 
 
-    const enableRegisterScreen=()=>{
+    }, [fieldsForm])
+
+    const enableRegisterScreen = () => {
         navigation.navigate('RegisterScreen')
+    }
+
+    const enableLogin = () => {
+        validateForm()
+
+        setVisible(true)
+        setTimeout(() => {
+            setVisible(false)
+        }, 3000)
+    }
+
+    const validateForm = () => {
+        setValidated((validated + 1))
+        console.log('LOGINSCREEN validated form', validated)
+    }
+
+    const isValidatedField = (id: string, validate: boolean) => {
+        const array = []
+        array.push([id, validate])
+        setFieldsForm({ ...fieldsForm, ...Object.fromEntries(new Map(array)) })
     }
 
     return (
@@ -50,47 +76,45 @@ export const LoginScreen = ({navigation}:Props) => {
             enableAutomaticScroll={true}
         >
             <View style={styles.container}>
-                <View style={styles.space}></View>
-                <View style={styles.form}>
+                <View key='idLoader' style={styles.space}>
+                    <LoaderGeneric
+                        visible={false}
+                    />
+                </View>
+                <View key='idLoginForm' style={styles.form}>
                     <Image
                         resizeMode='contain'
                         style={styles.imageLogo}
                         source={SPLASH_SCREEN.PATH_SPLASH}
                     />
-                    <View style={styles.field}>
-                        <Text style={styles.textField}>{LOGIN_SCREEN.EMAIL}</Text>
-                        <TextInput
-                            onFocus={() => onFocus('idEmail')}
-                            onBlur={onBlur}
-                            selectionColor='#7f1ae5'
-                            style={[styles.textInput, { borderWidth: focus === 'idEmail' ? 3 : 1}]}
-                            value={email}
-                            placeholder={LOGIN_SCREEN.EMAIL_WATERMARK}
-                            onChangeText={onChangeEmail}
-                        />
+                    <TextInputGeneric
+                        id='email'
+                        validated={validated}
+                        textLabel={LOGIN_SCREEN.EMAIL}
+                        placeHolder={LOGIN_SCREEN.EMAIL_WATERMARK}
+                        labelRule='EMAIL'
+                        rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.EMAIL]}
+                        isValidatedField={isValidatedField}
+                    />
+                    <TextInputGeneric
+                        id='password'
+                        validated={validated}
+                        textLabel={LOGIN_SCREEN.PASSWORD}
+                        placeHolder={LOGIN_SCREEN.PASSWORD_WATERMARK}
+                        labelRule='Contraseña'
+                        rules={[KEY_RULE_CONSTANT.REQUIRED]}
+                        isValidatedField={isValidatedField}
+                    />
+                    <View key='fieldLogin' style={styles.buttonField}>
+                        <Button onPress={enableLogin} title={LOGIN_SCREEN.BUTTON_NAME} color='#7f1ae5' />
                     </View>
-                    <View style={styles.field}>
-                        <Text style={styles.textField}>{LOGIN_SCREEN.PASSWORD}</Text>
-                        <TextInput
-                            onFocus={() => onFocus('idPassword')}
-                            onBlur={onBlur}
-                            style={[styles.textInput, { borderWidth: focus === 'idPassword' ? 3 : 1}]}
-                            selectionColor='#7f1ae5'
-                            value={password}
-                            placeholder={LOGIN_SCREEN.PASSWORD_WATERMARK}
-                            onChangeText={onChangePassword}
-                        />
-                    </View>
-                    <View style={styles.buttonField}>
-                        <Button title={LOGIN_SCREEN.BUTTON_NAME} color='#7f1ae5' />
-                    </View>
-                    <View style={styles.register}>
+                    <View key='fieldRegister' style={styles.register}>
                         <TouchableOpacity onPress={enableRegisterScreen}>
                             <Text style={styles.textRegister}>{LOGIN_SCREEN.REGISTER}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={styles.space}></View>
+                <View key='idSpace' style={styles.space}></View>
             </View>
         </KeyboardAwareScrollView>
     )
@@ -99,6 +123,7 @@ export const LoginScreen = ({navigation}:Props) => {
 const styles = StyleSheet.create({
     space: {
         flex: 1,
+        backgroundColor: 'white'
     },
     container: {
         flex: 1,
@@ -143,5 +168,10 @@ const styles = StyleSheet.create({
     textRegister: {
         color: 'blue',
         textDecorationLine: 'underline'
+    },
+    textError: {
+        color: 'red',
+        fontSize: 10,
+        marginLeft: 5
     }
 })
