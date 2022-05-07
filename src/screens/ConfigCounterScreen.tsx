@@ -16,7 +16,7 @@ import { ToastGeneric } from '../components/generic/ToastGeneric';
 import { REGISTER_SCREEN, SELECT_OPTION } from '../constants/GlobalConstant';
 import { KEY_RULE_CONSTANT } from '../constants/validator/KeyRuleConstant';
 
-export const RegisterScreen = () => {
+export const ConfigCounterScreen = () => {
 
   const [validated, setValidated] = useState(0)
   const [visible, setVisible] = useState(false)
@@ -28,7 +28,6 @@ export const RegisterScreen = () => {
     password: { validated: false, value: '' }
   })
   const prevFieldsForm = useRef({ fieldsForm, setFieldsForm })
-
 
   const isValidatedField = (obj: any) => {
     setFieldsForm({ ...fieldsForm, ...obj })
@@ -71,9 +70,9 @@ export const RegisterScreen = () => {
       viewIsInsideTabBar={true}
       enableAutomaticScroll={true}
       // Doesn't work on RN 0.56 for either Android or iOS
-      extraHeight={300}
+      extraHeight={-300}
       // Works on iOS but not Android in RN 0.56
-      extraScrollHeight={300}
+      extraScrollHeight={-300}
       scrollEnabled={true}
     >
       <View style={styles.container}>
@@ -194,6 +193,8 @@ const styles = StyleSheet.create({
   buttonField: {
     flex: 1,
     justifyContent: 'center',
+    backgroundColor:'red',
+    bottom:0,
   },
   button:{
     height:'100%'

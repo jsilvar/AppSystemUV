@@ -1,3 +1,4 @@
+import { NavigationHelpersContext } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React from 'react';
 import {
@@ -13,24 +14,20 @@ interface Props extends StackScreenProps<any, any> {
 
 export const ScreenMain = ({navigation}:Props) => {
 
-    const displaySplashScreen=()=>{
-        navigation.navigate('SplashScreen')
-    }
-
-    const displayLoginScreen=()=>{
-        navigation.navigate('LoginScreen')
-    }
-
-    const displayRegisterScreen=()=>{
-        navigation.navigate('RegisterScreen')
+    const onPressScreen=(e:any)=>{
+        console.log('onPressScreen: ',e)
+        navigation.navigate(e)
     }
 
     return (
         <View>
             <Text>Main Screen Only Test</Text>
-            <Button title='splash' onPress={displaySplashScreen} />
-            <Button title='login' onPress={displayLoginScreen} />
-            <Button title='register' onPress={displayRegisterScreen} />
+            <Button title='splash' onPress={()=>onPressScreen('SplashScreen')}  />
+            <Button title='login' onPress={()=>onPressScreen('LoginScreen')} />
+            <Button title='register' onPress={()=>onPressScreen('RegisterScreen')} />
+            <Button title='counter' onPress={()=>onPressScreen('CounterScreen')} />
+            <Button title='userInfo' onPress={()=>onPressScreen('UserInfoGeneralScreen')} />
+            <Button title='ConfigCounter' onPress={()=>onPressScreen('ConfigCounterScreen')} />
         </View>
     )
 }

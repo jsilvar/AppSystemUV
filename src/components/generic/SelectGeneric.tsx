@@ -1,21 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react'
 import {
     View,
     Text,
-    TextInput,
+    useWindowDimensions,
     StyleSheet
 } from 'react-native';
 
-import uuid from 'react-native-uuid';
-
-//validation
+import SelectDropdown from 'react-native-select-dropdown';
 import { useValidation } from 'react-native-form-validator';
 import MESSAGES_CONSTANT from '../../constants/validator/MessagesConstant';
 import RULES_CONSTANT from '../../constants/validator/RulesConstant';
 import LABELS_CONSTANT from '../../constants/validator/LabelsConstant';
-
-import { LOGIN_SCREEN, SPLASH_SCREEN } from '../../constants/GlobalConstant';
-import { useLinkProps } from '@react-navigation/native';
 
 interface Props {
     id: string;
@@ -23,19 +18,20 @@ interface Props {
     textLabel: string,
     labelRule: string;
     rules: Array<string>;
-    placeHolder: string;
-    secure?:boolean;
-    isValidatedField(obj:any): void;
+    secure?: boolean;
+    data: Array<String>;
+    defaultValue: string;
+    isValidatedField(obj: any): void;
 }
 
-
-export const TextInputGeneric = (props: Props) => {
+export const SelectGeneric = (props: Props) => {
 
     const [id, setId] = useState(props.id)
     const [focus, setFocus] = useState(false);
     const [validated, setvalidated] = useState(0)
     const [idTextGeneric, setIdTextGeneric] = useState('')
-    const prevIdTextGeneric = useRef({idTextGeneric,setIdTextGeneric}).current;
+    const [textLabel, setTextLabel] = useState(props.textLabel)
+    const prevIdTextGeneric = useRef({ idTextGeneric, setIdTextGeneric }).current;
 
     //rule array adding default value: 'idTextGeneric'
     const [rules, setRules] = useState(props.rules)
@@ -51,7 +47,6 @@ export const TextInputGeneric = (props: Props) => {
         })
         return Object.fromEntries(new Map(finalArray))
     }
-
     const [rulesCustomer, setRulesCustomer] = useState(() => {
         const initialRulesCustomer = getInitialRulesCustomer();
         return initialRulesCustomer;
@@ -107,13 +102,13 @@ export const TextInputGeneric = (props: Props) => {
             setvalidated(props.validated)
             validateForm()
         }
-        if(idTextGeneric!== prevIdTextGeneric.idTextGeneric){
+        if (idTextGeneric !== prevIdTextGeneric.idTextGeneric) {
             console.log('change idTextGeneric')
             validateForm()
         }
-        return ()=>{
-            prevIdTextGeneric.idTextGeneric=idTextGeneric
-            prevIdTextGeneric.setIdTextGeneric=setIdTextGeneric
+        return () => {
+            prevIdTextGeneric.idTextGeneric = idTextGeneric
+            prevIdTextGeneric.setIdTextGeneric = setIdTextGeneric
         }
     }, [props.validated, idTextGeneric])
 
@@ -123,28 +118,42 @@ export const TextInputGeneric = (props: Props) => {
 
         console.log('validate form')
         //validate form
-        const validateForm = validate({idTextGeneric: validateField});
+        const validateForm = validate({ idTextGeneric: validateField });
         //inform parent of update
         props.isValidatedField(JSON.parse(`{"${id}":{"validated":${validateForm},"value":"${idTextGeneric}"}}`))
     }
 
-    const onChangeText = (newValue: any) => {
-        setIdTextGeneric(newValue)
-    }
-
     return (
         <View key={id} style={styles.field}>
-            <Text key='idField' style={styles.textField}>{props.textLabel}</Text>
-            <TextInput
-                key={id}
-                onFocus={() => onFocus(id)}
-                onBlur={onBlur}
-                selectionColor='#7f1ae5'
-                style={[styles.textInput, { borderWidth: focus === id ? 3 : 1 }]}
-                value={idTextGeneric}
-                placeholder={props.placeHolder}
-                onChangeText={onChangeText}
-                secureTextEntry={props.secure?true:false}
+            <Text key='idField' style={styles.textField}>{textLabel}</Text>
+            <SelectDropdown
+                data={props.data}
+                onSelect={(selectedItem, index) => {
+                    console.log(selectedItem, index)
+                    setIdTextGeneric(selectedItem)
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                    // text represented after item is selected
+                    // if data array is an array of objects then return selectedItem.property to render after item is selected
+                    console.log('button after selection', selectedItem, index)
+                    return selectedItem
+                }}
+                rowTextForSelection={(item, index) => {
+                    // text represented for each item in dropdown
+                    // if data array is an array of objects then return item.property to represent item in dropdown
+                    console.log('text for selection', item, index)
+                    return item
+                }}
+                defaultButtonText={props.defaultValue}
+                buttonStyle={styles.dropdown4BtnStyle}
+                buttonTextStyle={styles.dropdown4BtnTxtStyle}
+                // renderDropdownIcon={isOpened => {
+                //   return <FontAwesome name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#444'} size={18} />;
+                // }}
+                //dropdownIconPosition={'left'}
+                dropdownStyle={styles.dropdown4DropdownStyle}
+                rowStyle={styles.dropdown4RowStyle}
+                rowTextStyle={styles.dropdown4RowTxtStyle}
             />
             {isFieldInError('idTextGeneric') &&
                 getErrorsInField('idTextGeneric').map((errorMessage, index) => (
@@ -154,8 +163,28 @@ export const TextInputGeneric = (props: Props) => {
     )
 }
 
-
 const styles = StyleSheet.create({
+    shadow: {
+        shadowColor: '#000',
+        shadowOffset: { width: '100%', height: 6 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 10,
+    },
+    dropdown4BtnStyle: {
+        width: '98%',
+        height: 35,
+        backgroundColor: '#FFF',
+        borderRadius: 2,
+        borderWidth: 1,
+        borderColor: '#7f1ae5',
+        margin: 5,
+        fontSize: 10
+    },
+    dropdown4BtnTxtStyle: { color: '#444', textAlign: 'left', fontSize: 15, padding: 0 },
+    dropdown4DropdownStyle: { backgroundColor: '#EFEFEF' },
+    dropdown4RowStyle: { backgroundColor: '#EFEFEF', borderBottomColor: '#C5C5C5' },
+    dropdown4RowTxtStyle: { color: '#444', textAlign: 'left' },
     field: {
         flex: 2,
     },
@@ -174,7 +203,7 @@ const styles = StyleSheet.create({
         elevation: 2
     },
     textField: {
-        margin: 2,
+        margin: 5,
     },
     textRegister: {
         color: 'blue',
@@ -185,4 +214,5 @@ const styles = StyleSheet.create({
         fontSize: 10,
         marginLeft: 5
     }
-})
+});
+
