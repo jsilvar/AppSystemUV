@@ -10,6 +10,7 @@ import {
 //config keyboard
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { LoaderGeneric } from '../components/generic/LoaderGeneric';
+import { PickerGeneric } from '../components/generic/PickerGeneric';
 import { SelectGeneric } from '../components/generic/SelectGeneric';
 import { TextInputGeneric } from '../components/generic/TextInputGeneric';
 import { ToastGeneric } from '../components/generic/ToastGeneric';
@@ -89,6 +90,16 @@ export const ConfigCounterScreen = () => {
         </View>
         <View key='idRegisterForm' style={styles.form}>
           <ScrollView style={styles.scrollView}>
+            <PickerGeneric
+              id='idRole'
+              validated={validated}
+              textLabel={REGISTER_SCREEN.ROLE}
+              data={SELECT_OPTION.LIST_TYPE_USER}
+              defaultValue={SELECT_OPTION.DEFAULT}
+              labelRule='rol'
+              rules={[KEY_RULE_CONSTANT.REQUIRED]}
+              isValidatedField={isValidatedField}
+            />
             <Text style={styles.titleForm}>REGISTRAR USUARIO</Text>
             <TextInputGeneric
               id='firstName'
@@ -144,7 +155,7 @@ export const ConfigCounterScreen = () => {
               rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.EMAIL]}
               isValidatedField={isValidatedField}
             />
-            <SelectGeneric 
+            <SelectGeneric
               id='idRole'
               validated={validated}
               textLabel={REGISTER_SCREEN.ROLE}
@@ -167,7 +178,7 @@ export const ConfigCounterScreen = () => {
 const styles = StyleSheet.create({
   space: {
     //flex: 1,
-    height:1
+    height: 1
   },
   titleForm: {
     flex: 1,
@@ -193,11 +204,11 @@ const styles = StyleSheet.create({
   buttonField: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor:'red',
-    bottom:0,
+    backgroundColor: 'red',
+    bottom: 0,
   },
-  button:{
-    height:'100%'
+  button: {
+    height: '100%'
   },
   register: {
     flex: 1,
