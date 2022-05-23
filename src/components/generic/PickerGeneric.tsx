@@ -19,8 +19,9 @@ interface Props {
     labelRule: string;
     rules: Array<string>;
     secure?: boolean;
-    data: Array<String>;
+    data: Array<any>;
     defaultValue: string;
+    placeHolder: string;
     isValidatedField(obj: any): void;
 }
 
@@ -98,12 +99,10 @@ export const PickerGeneric = (props: Props) => {
 
     useEffect(() => {
         if (props.validated !== validated) {
-            console.log('change validated')
             setvalidated(props.validated)
             validateForm()
         }
         if (idTextGeneric !== prevIdTextGeneric.idTextGeneric) {
-            console.log('change idTextGeneric')
             validateForm()
         }
         return () => {
@@ -114,28 +113,29 @@ export const PickerGeneric = (props: Props) => {
 
 
     const validateForm = () => {
-        if (!props.validated) return
-
-        console.log('validate form')
-        //validate form
-        const validateForm = validate({ idTextGeneric: validateField });
-        //inform parent of update
-        props.isValidatedField(JSON.parse(`{"${id}":{"validated":${validateForm},"value":"${idTextGeneric}"}}`))
+        if (props.validated===0) {
+            props.isValidatedField(JSON.parse(`{"${id}":{"validated":false,"value":"${idTextGeneric}"}}`))
+        } else {
+            //validate form
+            const validateForm = validate({ idTextGeneric: validateField });
+            //inform parent of update
+            props.isValidatedField(JSON.parse(`{"${id}":{"validated":${validateForm},"value":"${idTextGeneric}"}}`))
+        }
     }
 
     return (
         <View key={id} style={styles.field}>
             <Text key='idField' style={styles.textField}>{textLabel}</Text>
             <RNPickerSelect
-                placeholder={{ label: "Select you favourite language", value: '', key:'gray',color:'gray' }}
-                style={{ inputAndroid: { ...stylePicker.inputAndroid, borderWidth:focus===id? 3:1 } }}
+                placeholder={{ label: props.placeHolder, value: '', key: 'gray', color: 'gray' }}
+                style={{ inputAndroid: { ...stylePicker.inputAndroid, borderWidth: focus === id ? 3 : 1 } }}
                 useNativeAndroidPickerStyle={false}
                 onValueChange={(value) => setIdTextGeneric(value)}
                 items={props.data}
-                value=''
+                value={idTextGeneric}
                 pickerProps={{
-                    onFocus:()=>onFocus(id),
-                    onBlur:()=>onBlur()
+                    onFocus: () => onFocus(id),
+                    onBlur: () => onBlur()
                 }}
             />
             {isFieldInError('idTextGeneric') &&

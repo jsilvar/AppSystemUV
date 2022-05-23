@@ -2,6 +2,7 @@
 
 // Custom default rules to validate form fields
 const RULES_CONSTANT= {
+    timer: /\S+/,
     required: /\S+/,
     password: /^(([0-9]*)|(([0-9]*)\.([0-9]*)))$/,
     email:

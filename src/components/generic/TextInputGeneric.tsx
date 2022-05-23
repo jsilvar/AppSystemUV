@@ -24,8 +24,8 @@ interface Props {
     labelRule: string;
     rules: Array<string>;
     placeHolder: string;
-    secure?:boolean;
-    isValidatedField(obj:any): void;
+    secure?: boolean;
+    isValidatedField(obj: any): void;
 }
 
 
@@ -35,7 +35,7 @@ export const TextInputGeneric = (props: Props) => {
     const [focus, setFocus] = useState(false);
     const [validated, setvalidated] = useState(0)
     const [idTextGeneric, setIdTextGeneric] = useState('')
-    const prevIdTextGeneric = useRef({idTextGeneric,setIdTextGeneric}).current;
+    const prevIdTextGeneric = useRef({ idTextGeneric, setIdTextGeneric }).current;
 
     //rule array adding default value: 'idTextGeneric'
     const [rules, setRules] = useState(props.rules)
@@ -107,25 +107,27 @@ export const TextInputGeneric = (props: Props) => {
             setvalidated(props.validated)
             validateForm()
         }
-        if(idTextGeneric!== prevIdTextGeneric.idTextGeneric){
+        if (idTextGeneric !== prevIdTextGeneric.idTextGeneric) {
             console.log('change idTextGeneric')
             validateForm()
         }
-        return ()=>{
-            prevIdTextGeneric.idTextGeneric=idTextGeneric
-            prevIdTextGeneric.setIdTextGeneric=setIdTextGeneric
+        return () => {
+            prevIdTextGeneric.idTextGeneric = idTextGeneric
+            prevIdTextGeneric.setIdTextGeneric = setIdTextGeneric
         }
     }, [props.validated, idTextGeneric])
 
 
     const validateForm = () => {
-        if (!props.validated) return
-
-        console.log('validate form')
-        //validate form
-        const validateForm = validate({idTextGeneric: validateField});
-        //inform parent of update
-        props.isValidatedField(JSON.parse(`{"${id}":{"validated":${validateForm},"value":"${idTextGeneric}"}}`))
+        if (!props.validated) {
+            props.isValidatedField(JSON.parse(`{"${id}":{"validated":"false,"value":"${idTextGeneric}"}}`))
+        }
+        else {
+            //validate form
+            const validateForm = validate({ idTextGeneric: validateField });
+            //inform parent of update
+            props.isValidatedField(JSON.parse(`{"${id}":{"validated":${validateForm},"value":"${idTextGeneric}"}}`))
+        }
     }
 
     const onChangeText = (newValue: any) => {
@@ -144,7 +146,7 @@ export const TextInputGeneric = (props: Props) => {
                 value={idTextGeneric}
                 placeholder={props.placeHolder}
                 onChangeText={onChangeText}
-                secureTextEntry={props.secure?true:false}
+                secureTextEntry={props.secure ? true : false}
             />
             {isFieldInError('idTextGeneric') &&
                 getErrorsInField('idTextGeneric').map((errorMessage, index) => (

@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor:'cyan'
   },
   form: {
     flex: 16,
@@ -192,11 +193,11 @@ const styles = StyleSheet.create({
     flex: 2,
   },
   buttonField: {
-    flex: 1,
+    //flex: 1,
     justifyContent: 'center',
   },
   button:{
-    height:'100%'
+    //height:'100%'
   },
   register: {
     flex: 1,
