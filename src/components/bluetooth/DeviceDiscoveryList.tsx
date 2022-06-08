@@ -19,7 +19,7 @@ interface Props {
   onDevicePressed(item: any): void
 }
 
-export const DeviceList = (props: Props) => {
+export const DeviceDiscoveryList = (props: Props) => {
   const [selectedId, setSelectedId] = useState(null)
   const [devices, setDevices] = useState(props.devices)
 

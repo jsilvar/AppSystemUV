@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     },
     centeredView: {
         flex: 1,
-        backgroundColor: "rgba(52,52,52,0.5)",
+        backgroundColor: "rgba(52,52,52,0.0)",
         justifyContent: "center",
         alignItems: "center",
     },

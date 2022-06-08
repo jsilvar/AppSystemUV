@@ -167,7 +167,7 @@ export const TimerGeneric = (props: Props) => {
         <View key='minutes' style={styles.minutes}>
           <View style={{ flex: 1 }}>
             <RNPickerSelect
-              placeholder={{ label: SELECT_NUMBER.DEFAULT, value: '0', key: 'gray', color: 'gray' }}
+              placeholder={{ label: SELECT_NUMBER.DEFAULT, value: '', key: 'gray', color: 'gray' }}
               style={{ inputAndroid: { ...stylePicker.inputAndroid, borderWidth: focus === 'idTenMinute' ? 3 : 1 } }}
               useNativeAndroidPickerStyle={false}
               onValueChange={(value) => onChange('idTenMinute', value)}

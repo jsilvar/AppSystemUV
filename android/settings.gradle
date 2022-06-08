@@ -1,4 +1,8 @@
 rootProject.name = 'BluetoothUV'
+include ':@react-native-async-storage_async-storage'
+project(':@react-native-async-storage_async-storage').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-async-storage/async-storage/android')
+include ':@react-native-async-storage_async-storage'
+project(':@react-native-async-storage_async-storage').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-async-storage/async-storage/android')
 include ':react-native-svg'
 project(':react-native-svg').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-svg/android')
 include ':react-native-vector-icons'
@@ -10,3 +14,6 @@ include ':app'
 
 include ':react-native-spinkit'
 project(':react-native-spinkit').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-spinkit/android')
+
+//include ':@react-native-async-storage'
+//project(':@react-native-async-storage').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-async-storage/async-storage/android')

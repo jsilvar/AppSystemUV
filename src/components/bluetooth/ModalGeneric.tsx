@@ -1,83 +1,90 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import { Alert, Modal, StyleSheet, Text, Pressable, View } from "react-native";
 
-class ModalGeneric extends Component {
+interface Props {
+  modalVisible: boolean;
+  deviceUnique:any;
+  connect(device:any):void;
+  disconnect(device:any):void;
+  onChange(visible: boolean): void;
+}
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      modalVisible: false
-    }
-    this.onChange = this.onChange.bind(this)
+
+export const ModalGeneric = (props: Props) => {
+
+  const [modalVisible, setModal] = useState(props.modalVisible)
+  const [deviceUnique,setDeviceUnique]=useState(props.deviceUnique)
+
+  useEffect(() => {
+    setModal(props.modalVisible)
+    setDeviceUnique(props.deviceUnique)
+  }, [props.modalVisible,props.deviceUnique])
+
+  const setModalVisible = (visible) => {
+    setModal(visible)
+    onChange(visible)
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.modalVisible !== this.props.modalVisible) {
-      console.log('COMPONENT DID UPDATE MODAL GENERIC')
-      console.log('\n UPDATE MODAL GENERIC',)
-      this.setState({
-        modalVisible: this.props.modalVisible
-      })
-    }
+  const onChange = (visible) => {
+    setModal(visible)
+    props.onChange(visible)
+    console.log('MODAL GENERIC', visible)
   }
 
-  setModalVisible = (visible) => {
-    this.setState({ modalVisible: visible });
-    this.onChange(visible)
+  const connect=()=>{
+    console.log('connect',deviceUnique)
+    setModalVisible(!modalVisible)
+    props.connect(deviceUnique)
   }
 
-  onChange(visible) {
-    this.setState({ modalVisible: visible });
-    this.props.onChange(visible)
-    console.log('\nMODAL GENERIC', visible)
+  const disconnect=()=>{
+    setModalVisible(!modalVisible)
+    props.disconnect(deviceUnique)
   }
 
+  return (
+    <View style={styles.centeredView}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <View style={styles.header}>
+              <Text style={styles.modalText}>ESCOJA UNA OPCIÓN</Text>
+            </View>
+            <View style={styles.body}>
+              <Pressable
+                style={[styles.button, styles.buttonConnect]}
+                onPress={connect}
+              >
+                <Text style={styles.textStyle}>Conectar</Text>
+              </Pressable>
 
-  render() {
-    const { modalVisible } = this.state;
-    return (
-      <View style={styles.centeredView}>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <View style={styles.header}>
-                <Text style={styles.modalText}>ESCOJA UNA OPCIÓN</Text>
-              </View>
-              <View style={styles.body}>
-                <Pressable
-                  style={[styles.button, styles.buttonConnect]}
-                  onPress={() => this.setModalVisible(!modalVisible)}
-                >
-                  <Text style={styles.textStyle}>Conectar</Text>
-                </Pressable>
+              <Pressable
+                style={[styles.button, styles.buttonUnpaired]}
+                onPress={disconnect}
+              >
+                <Text style={styles.textStyle}>Desvincular</Text>
+              </Pressable>
+            </View>
 
-                <Pressable
-                  style={[styles.button, styles.buttonUnpaired]}
-                  onPress={() => this.setModalVisible(!modalVisible)}
-                >
-                  <Text style={styles.textStyle}>Desvincular</Text>
-                </Pressable>
-              </View>
-
-              <View style={styles.footer}>
-                <Pressable
-                  style={[styles.button, styles.buttonClose]}
-                  onPress={() => this.setModalVisible(!modalVisible)}
-                >
-                  <Text style={styles.textStyle}>Cerrar</Text>
-                </Pressable>
-              </View>
+            <View style={styles.footer}>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setModalVisible(!modalVisible)}
+              >
+                <Text style={styles.textStyle}>Cerrar</Text>
+              </Pressable>
             </View>
           </View>
-        </Modal>
-      </View>
-    );
-  }
+        </View>
+      </Modal>
+    </View>
+  );
 }
+
 
 const styles = StyleSheet.create({
   centeredView: {
@@ -88,8 +95,8 @@ const styles = StyleSheet.create({
   },
   modalView: {
     flexDirection: 'column',
-    height:'25%',
-    width:'70%',
+    height: '25%',
+    width: '70%',
     margin: 0,
     backgroundColor: "red",
     borderRadius: 5,
@@ -107,69 +114,69 @@ const styles = StyleSheet.create({
   button: {
     borderRadius: 5,
     elevation: 2,
-    height:'70%',
-    marginTop:'3%'
+    height: '70%',
+    marginTop: '3%'
   },
   buttonConnect: {
     backgroundColor: "#F194FF",
-    width:'40%',
-    flexDirection:'row',
-    justifyContent:'center',
-    alignCenter:'center',
+    width: '40%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonUnpaired: {
     backgroundColor: "#F194FF",
-    width:'40%',
-    justifyContent:'center',
-    alignCenter:'center',
+    width: '40%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonClose: {
     backgroundColor: "#2196F3",
-    width:'80%',
+    width: '80%',
     textAlign: "center",
-    textAlignVertical:'center',
-    justifyContent:'center',
-    alignCenter:'center',
+    textAlignVertical: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textStyle: {
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
-    textAlignVertical:'center'
+    textAlignVertical: 'center'
   },
   modalText: {
-    fontSize:20,
-    justifyContent:'center',
-    alignCenter:'center',
+    fontSize: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
     textAlign: "center",
-    textAlignVertical:'center',
+    textAlignVertical: 'center',
   },
   header: {
-    flex:1,
-    backgroundColor:'orange',
-    width:'100%',
-    justifyContent:'center',
-    alignCenter:'center',
-    textAlignVertical:'center'
+    flex: 1,
+    backgroundColor: 'orange',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlignVertical: 'center'
   },
   body: {
-    flex:1,
-    flexDirection:'row',
-    width:'100%',
-    alignItemns: 'center',
-    backgroundColor:'skyblue',
-    justifyContent:'space-evenly',
-    textAlignVertical:'center',
-    alingSelf:'center'
+    flex: 1,
+    flexDirection: 'row',
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: 'skyblue',
+    justifyContent: 'space-evenly',
+    textAlignVertical: 'center',
+    alignSelf: 'center'
   },
   footer: {
-    flexDirection:'row',
-    backgroundColor:'red',
-    width:'100%',
-    alignContent:'center',
-    justifyContent:'center',
-    textAlignVertical:'center',
-    flex:1,
+    flexDirection: 'row',
+    backgroundColor: 'red',
+    width: '100%',
+    alignContent: 'center',
+    justifyContent: 'center',
+    textAlignVertical: 'center',
+    flex: 1,
   }
 });
 

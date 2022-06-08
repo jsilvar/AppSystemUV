@@ -1,14 +1,13 @@
 export const GLOBAL_CONSTANT = {
-
-    TOAST: {
-        ERROR: {
-            TYPE: 'error',
-            TITLE: '¡ERROR!'
-        },
-        success: {
-            type: 'success',
-            title: ''
-        }
+    TOAST_SUCCESS:'success',
+    TOAST_ERROR:'error',
+    TOAST_REGISTER:{
+        TITLE:'¡Registro exitoso!',
+        MESSAGE:'Su registro se procesó exitosamente.'
+    },
+    TOAST_NOT_REGISTER:{
+        TITLE:'¡Registro faliido!',
+        MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
     }
 }
 
@@ -82,8 +81,22 @@ export const COUNTER_DOWN={
     TITLE:'TIEMPO DE DESINFECCIÓN UV',
     FINISHED_TIME:'Tiempo finalizado',
     REMAINING_TIME:'Tiempo restante',
+    WITHOUT_DATA_SENSOR:'Pendiente datos sensor',
+    DATA_SENSOR:'SENSOR: {0} mW/cm2',
+    CONSTANT_UV:0.1234,
+    RESET_LAMPS:'RESET_LAMPS',
     START_BUTTON:'INICIAR',
-    PAUSE_BUTTON:'PAUSAR'
+    PAUSE_BUTTON:'PAUSAR',
+    TOAST_SUCCESS:'success',
+    TOAST_ERROR:'error',
+    TOAST_REGISTER:{
+        TITLE:'¡Registro exitoso!',
+        MESSAGE:'Su registro se procesó exitosamente.'
+    },
+    TOAST_NOT_REGISTER:{
+        TITLE:'¡Registro faliido!',
+        MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
+    },
 }
 
 export const SELECT_OPTION={

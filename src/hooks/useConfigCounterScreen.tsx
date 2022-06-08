@@ -1,145 +1,163 @@
 import React, { useState, useRef, useEffect } from 'react'
-
 //navigation
 import { StackScreenProps } from '@react-navigation/stack';
-
-
+//storage
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const luminariesExample = {
-    LAMP1: { l1: true, l2: false, l3: false, l4: false, l5: false, l6: false, l7: false },
-    LAMP2: { l1: false, l2: true, l3: false, l4: false, l5: false, l6: false, l7: false },
-    LAMP3: { l1: false, l2: false, l3: true, l4: false, l5: false, l6: false, l7: false },
-    LAMP4: { l1: false, l2: false, l3: false, l4: true, l5: false, l6: false, l7: false },
-    LAMP5: { l1: false, l2: false, l3: false, l4: false, l5: true, l6: false, l7: false },
-    LAMP6: { l1: false, l2: false, l3: false, l4: false, l5: false, l6: true, l7: false },
-    LAMP7: { l1: false, l2: false, l3: false, l4: false, l5: false, l6: false, l7: true },
+  LAMP1: { l1: true, l2: false, l3: false, l4: false, l5: false, l6: false, l7: false },
+  LAMP2: { l1: false, l2: true, l3: false, l4: false, l5: false, l6: false, l7: false },
+  LAMP3: { l1: false, l2: false, l3: true, l4: false, l5: false, l6: false, l7: false },
+  LAMP4: { l1: false, l2: false, l3: false, l4: true, l5: false, l6: false, l7: false },
+  LAMP5: { l1: false, l2: false, l3: false, l4: false, l5: true, l6: false, l7: false },
+  LAMP6: { l1: false, l2: false, l3: false, l4: false, l5: false, l6: true, l7: false },
+  LAMP7: { l1: false, l2: false, l3: false, l4: false, l5: false, l6: false, l7: true },
 
-    GROUP1: { l1: true, l2: false, l3: false, l4: true, l5: false, l6: false, l7: true },
-    GROUP2: { l1: true, l2: false, l3: true, l4: true, l5: true, l6: false, l7: true },
-    GROUP3: { l1: true, l2: true, l3: false, l4: true, l5: false, l6: true, l7: true },
-    GROUP4: { l1: true, l2: true, l3: false, l4: false, l5: false, l6: true, l7: true },
-    GROUP5: { l1: true, l2: false, l3: true, l4: false, l5: true, l6: false, l7: true },
+  GROUP1: { l1: true, l2: false, l3: false, l4: true, l5: false, l6: false, l7: true },
+  GROUP2: { l1: true, l2: false, l3: true, l4: true, l5: true, l6: false, l7: true },
+  GROUP3: { l1: true, l2: true, l3: false, l4: true, l5: false, l6: true, l7: true },
+  GROUP4: { l1: true, l2: true, l3: false, l4: false, l5: false, l6: true, l7: true },
+  GROUP5: { l1: true, l2: false, l3: true, l4: false, l5: true, l6: false, l7: true },
 
-    ALL_LAMPS: { l1: true, l2: true, l3: true, l4: true, l5: true, l6: true, l7: true },
-    RESET_LAMPS: { l1: false, l2: false, l3: false, l4: false, l5: false, l6: false, l7: false },
+  ALL_LAMPS: { l1: true, l2: true, l3: true, l4: true, l5: true, l6: true, l7: true },
+  RESET_LAMPS: { l1: false, l2: false, l3: false, l4: false, l5: false, l6: false, l7: false },
 }
 
 const usePrevious = (value) => {
-    const ref = useRef();
-    useEffect(() => {
-        ref.current = value;
-    }, [value]);
-    return ref.current;
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
 }
 
 export const useConfigCounterScreen = (navigation) => {
 
-    //const visible loader and toast
-    const [visible, setVisible] = useState(false)
-    //const toast
-    const [titleToast, setTitleToast] = useState('')
-    const [messageToast, setMessageToast] = useState('')
-    const [typeToast, setTypeToast] = useState('')
-    //validated fields
-    const [validated, setValidated] = useState(0)
-    const [changeValidated,setChangeValidated]=useState(false)
-    const prevValidated = usePrevious(validated)
-    //values luminaries list
-    const [luminariesList, setLuminariesList] = useState({ l1: false, l2: false, l3: false, l4: false, l5: false, l6: false, l7: false })
-    //values components
-    const [classRoom, setClassRoom] = useState('');
-    const [luminaries, setLuminaries] = useState('')
-    const prevLuminaries = usePrevious(luminaries)
-    const [timerCountDown, setTimerCountDown] = useState('')
-    //values field form
-    const [fieldsForm, setFieldsForm] = useState({
-        classRoom: { validated: false, value: '' },
-        luminaries: { validated: false, value: '' },
-        timerCountDown: { validated: false, value: '' }
+  //const visible loader and toast
+  const [visible, setVisible] = useState(false)
+  //const toast
+  const [titleToast, setTitleToast] = useState('')
+  const [messageToast, setMessageToast] = useState('')
+  const [typeToast, setTypeToast] = useState('')
+  //validated fields
+  const [validated, setValidated] = useState(0)
+  const [changeValidated, setChangeValidated] = useState(false)
+  const prevValidated = usePrevious(validated)
+  //values luminaries list
+  const [luminariesList, setLuminariesList] = useState({ l1: false, l2: false, l3: false, l4: false, l5: false, l6: false, l7: false })
+  //values components
+  const [classRoom, setClassRoom] = useState('');
+  const [luminaries, setLuminaries] = useState('')
+  const prevLuminaries = usePrevious(luminaries)
+  const [timerCountDown, setTimerCountDown] = useState('')
+  const [deviceBluetoothConnect,setDeviceBluetoothConnect]=useState('')
+  const [disabledReadBluetooth,setDisabledReadBluetooth]=useState(false)
+  //values field form
+  const [fieldsForm, setFieldsForm] = useState({
+    classRoom: { validated: false, value: '' },
+    luminaries: { validated: false, value: '' },
+    timerCountDown: { validated: false, value: '' }
+  })
+
+  const getAsyncStorage = async () => {
+    try {
+      const savedDevice = await AsyncStorage.getItem("deviceBluetoothConnect");
+      const deviceTemp = JSON.parse(savedDevice);
+      console.log('counter async storage', deviceTemp);
+      await setDeviceBluetoothConnect(deviceTemp)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getValueFieldsForm = async (fieldsForm) => {
+    await setFieldsForm(fieldsForm)
+  }
+
+  useEffect(() => {
+    //call service 
+    const apiClassRoom = []
+    const apiLuminaries = luminariesExample
+
+    //check storage
+    getAsyncStorage()
+
+
+    const tempFieldForm = { ...fieldsForm, ...classRoom, ...luminaries, ...timerCountDown }
+    //setFieldsForm(tempFieldForm)
+    console.log('\n\nuseEffect tempField', tempFieldForm)
+    getValueFieldsForm(tempFieldForm)
+    console.log('validated', validated, prevValidated, fieldsForm)
+
+    if (luminaries !== prevLuminaries) {
+      if (luminaries.luminaries)
+        setLuminariesList(apiLuminaries[luminaries.luminaries.value])
+    }
+
+    if ((validated !== prevValidated) && !changeValidated) {
+      console.log('change validated', fieldsForm)
+      setChangeValidated(true)
+
+    } else if ((validated === prevValidated) && changeValidated) {
+      setChangeValidated(false)
+      checkValidatedAllField(tempFieldForm)
+      console.log('accept')
+    }
+
+    console.log('end\n\n')
+  }, [classRoom, luminaries, timerCountDown, validated])
+
+
+  //catch value components
+  const isValidatedFieldClassRoom = async (obj: any) => {
+    await setClassRoom(obj)
+  }
+  const isValidatedFieldLuminaries = async (obj: any) => {
+    await setLuminaries(obj)
+  }
+  const isValidatedFieldTimer = async (obj: any) => {
+    await setTimerCountDown(obj)
+  }
+
+  const acceptConfigCounter = async () => {
+    setValidated((validated + 1))
+  }
+
+  const checkValidatedAllField = async (tempField) => {
+
+    console.log('checkValidated', tempField)
+    //check validate
+    const validateField = Object.entries(tempField).map(field => { return field[1].validated })
+
+    //check fields that are true     
+    var quantityFieldTrue = 0
+    validateField.map(field => {
+      quantityFieldTrue = field ? (quantityFieldTrue + 1) : quantityFieldTrue
     })
 
-    const getValueFieldsForm=async(fieldsForm)=>{
-        await setFieldsForm(fieldsForm)
+    if (validateField.length === quantityFieldTrue) {
+      console.log('ALL FIELDS ARE TRUE', validateField, quantityFieldTrue)
+      tempField={...tempField,deviceBluetoothConnect}
+      console.log('from useConfigCounter',tempField)
+      navigation.navigate('CounterScreen', tempField)
     }
-    
-    useEffect(() => {
-        //call service luminaries
-        const apiLuminaries = luminariesExample
+    else
+      console.log('AT LEAST ONE FIELD IS FALSE', validateField, quantityFieldTrue)
+  }
 
-
-        const tempFieldForm = { ...fieldsForm, ...classRoom, ...luminaries, ...timerCountDown }
-        //setFieldsForm(tempFieldForm)
-        console.log('\n\nuseEffect tempField',tempFieldForm)
-        getValueFieldsForm(tempFieldForm)
-        console.log('validated', validated, prevValidated, fieldsForm)
-
-        if (luminaries !== prevLuminaries) {
-            if (luminaries.luminaries)
-                setLuminariesList(apiLuminaries[luminaries.luminaries.value])
-        }
-
-        if ((validated !== prevValidated) && !changeValidated) {
-            console.log('change validated', fieldsForm)
-            setChangeValidated(true)
-            
-        }else if((validated === prevValidated) && changeValidated){
-            setChangeValidated(false)
-            checkValidatedAllField(tempFieldForm)
-            console.log('accept')
-        }
-
-        console.log('end\n\n')
-    }, [classRoom, luminaries, timerCountDown, validated])
-
-
-    //catch value components
-    const isValidatedFieldClassRoom = async (obj: any) => {
-        await setClassRoom(obj)
-    }
-    const isValidatedFieldLuminaries = async (obj: any) => {
-        await setLuminaries(obj)
-    }
-    const isValidatedFieldTimer = async (obj: any) => {
-        await setTimerCountDown(obj)
-    }
-
-    const acceptConfigCounter = async () => {
-        setValidated((validated + 1))
-    }
-
-    const checkValidatedAllField = async (tempField) => {
-
-        console.log('checkValidated', tempField)
-        //check validate
-        const validateField = Object.entries(tempField).map(field => { return field[1].validated })
-
-        //check fields that are true     
-        var quantityFieldTrue = 0
-        validateField.map(field => {
-            quantityFieldTrue = field ? (quantityFieldTrue + 1) : quantityFieldTrue
-        })
-
-        if (validateField.length === quantityFieldTrue) {
-            console.log('ALL FIELDS ARE TRUE', validateField, quantityFieldTrue)
-            navigation.navigate('CounterScreen', tempField)
-        }
-        else
-            console.log('AT LEAST ONE FIELD IS FALSE', validateField, quantityFieldTrue)
-    }
-
-    return ({
-        visible,
-        titleToast,
-        messageToast,
-        typeToast,
-        validated,
-        luminariesList,
-        isValidatedFieldClassRoom,
-        isValidatedFieldLuminaries,
-        isValidatedFieldTimer,
-        acceptConfigCounter
-    }
-    )
+  return ({
+    visible,
+    titleToast,
+    messageToast,
+    typeToast,
+    validated,
+    luminariesList,
+    isValidatedFieldClassRoom,
+    isValidatedFieldLuminaries,
+    isValidatedFieldTimer,
+    acceptConfigCounter
+  }
+  )
 }
 
 /*

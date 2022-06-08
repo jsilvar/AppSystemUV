@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.horcrux.svg.SvgPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.nuttawutmalee.RCTBluetoothSerial.RCTBluetoothSerialPackage;
@@ -16,6 +18,7 @@ import java.util.List;
 import com.react.rnspinkit.RNSpinkitPackage;        
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.horcrux.svg.SvgPackage;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -34,6 +37,7 @@ public class MainApplication extends Application implements ReactApplication {
           // packages.add(new MyReactNativePackage());
           packages.add(new RNSpinkitPackage());
           //packages.add(new VectorIconsPackage());
+          //packages.add(new AsyncStoragePackage());
           return packages;
         }
 

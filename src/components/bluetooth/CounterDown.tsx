@@ -7,6 +7,19 @@ import { COUNTER_DOWN } from '../../constants/GlobalConstant'
 //navigation
 import { useRoute } from '@react-navigation/native';
 
+import { TOAST } from '../../constants/GlobalConstant';
+
+import { ToastGeneric } from '../../components/generic/ToastGeneric';
+
+import BluetoothSerial, {
+    withSubscription
+} from "react-native-bluetooth-serial-next";
+
+interface Params{
+    timerCountDown:any,
+    deviceBluetoothConnect:any,
+    luminaries:any,
+}
 
 export const CounterDown = () => {
 
@@ -15,15 +28,71 @@ export const CounterDown = () => {
     const [key, setKey] = useState(0);
     const { height, width } = useWindowDimensions()
     const { params } = useRoute();
-
+    //bluetooth
+    const [deviceConnect, setDeviceConnect] = useState()
+    const [messageBluetooth, setMessageBluetooth] = useState()
+    const [resetLamps, setResetLamps] = useState(COUNTER_DOWN.RESET_LAMPS)
+    const [dateIO, setDataIO] = useState(COUNTER_DOWN.WITHOUT_DATA_SENSOR)
+    const [disabledReadBluetooth, setDisabledReadBluetooth] = useState(false)
+    const [idIntervalReadBluetooth, setIdIntervalReadBluetooth] = useState()
+    //toast
+    const [typeToast, setTypeToast] = useState()
+    const [titleToast, setTitleToast] = useState()
+    const [messageToast, setMessageToast] = useState()
+    const [visibleToast, setVisibleToast] = useState(false)
 
     useEffect(() => {
-        console.log('change pause/run', isPlaying)
-        console.log('route', params)
-        console.log(params.timerCountDown.value.minute)
-        console.log(params.timerCountDown.value.second)
+        setDeviceConnect(params.deviceBluetoothConnect)
+        setMessageBluetooth(params.luminaries.value)
         convertTime(params)
-    }, [isPlaying,timeDuration])
+    }, [isPlaying, timeDuration])
+
+    const formatDataSensor = (data: string) => {
+        if (data === '')
+            setDataIO(COUNTER_DOWN.WITHOUT_DATA_SENSOR)
+        else{
+            const dataTemp = data.substring(data.search('=')+1,data.search(','))
+            let sensorUV=parseFloat(dataTemp)*COUNTER_DOWN.CONSTANT_UV
+            setDataIO(COUNTER_DOWN.DATA_SENSOR.replace('{0}', sensorUV.toFixed(2).toString()))
+        }
+    }
+
+    const readBluetooth = () => {
+        try {
+            BluetoothSerial.readEvery(
+                (data, intervalId) => {
+                    console.log('data arduino', data, 'idInterval', intervalId);
+                    setIdIntervalReadBluetooth(intervalId)
+                    formatDataSensor(data)
+                },
+                1000,
+                "\r\n"
+            );
+        } catch (e) {
+            renderToast('error', 'error', e.message)
+        }
+    };
+
+    const writeBluetooth = async (id, message) => {
+        try {
+            await BluetoothSerial.device(id).write(message);
+            console.log('write device', id, 'message', message)
+        } catch (e) {
+            renderToast('error', 'error', e.message)
+        }
+    };
+
+    //Parameterize toast
+    const renderToast = (type: string, title: string, message: string) => {
+        setTypeToast(type)
+        setTitleToast(title)
+        setMessageToast(message)
+        setVisibleToast(true)
+
+        setTimeout(() => {
+            setVisibleToast(false)
+        }, 2000);
+    }
 
     const convertTime = (params: any) => {
         if (params.timerCountDown) {
@@ -45,8 +114,25 @@ export const CounterDown = () => {
         return formatMinutes + formatSeconds
     };
 
+    const sendMessageBluetooth = (isPlaying: boolean) => {
+        setIsPlaying(isPlaying)
+        writeBluetooth(deviceConnect.id, messageBluetooth)
+        readBluetooth()
+    }
+
+    const restartMessageBluetooth = () => {
+        if (typeof deviceConnect !== 'undefined') {
+            console.log('reset lamps evaluated', idIntervalReadBluetooth)
+            writeBluetooth(deviceConnect.id, resetLamps)
+            //setDisabledReadBluetooth(true)
+            clearInterval(idIntervalReadBluetooth);
+        }
+    }
+
     const renderTime = ({ remainingTime }) => {
         if (remainingTime === 0) {
+            console.log('remaining time zero', remainingTime)
+            restartMessageBluetooth()
             return (
                 <View style={[style.timer, { width: width * 0.4, height: width * 0.5 }]}>
                     <Spinner
@@ -70,7 +156,7 @@ export const CounterDown = () => {
                     color={!isPlaying ? '#7f1ae5' : 'brown'}
                     style={style.timerButton}
                     title={!isPlaying ? COUNTER_DOWN.START_BUTTON : COUNTER_DOWN.PAUSE_BUTTON}
-                    onPress={() => setIsPlaying(!isPlaying)}
+                    onPress={() => sendMessageBluetooth(!isPlaying)}
                 />
             </View>
         );
@@ -78,9 +164,27 @@ export const CounterDown = () => {
 
     return (
         <View style={style.container}>
+            <View style={{ height: 1 }}>
+                <ToastGeneric
+                    title={titleToast}
+                    message={messageToast}
+                    type={typeToast}
+                    visible={visibleToast}
+                />
+                {/* <LoaderGeneric
+                    visible={visibleLoading}
+                />
+                <ModalGeneric
+                    modalVisible={modalVisible}
+                    deviceUnique={deviceUnique}
+                    onChange={(visible) => onChangeModalVisible(visible)}
+                    connect={connect}
+                    disconnect={disconnect}
+                /> */}
+            </View>
             <Text style={style.mainTitle}>{COUNTER_DOWN.TITLE}</Text>
             <View style={style.sensor}>
-                <Text style={style.sensorText}>SENSOR UV: 1.001 mW/cm2</Text>
+                <Text style={style.sensorText}>{dateIO}</Text>
             </View>
             <View style={style.timerWrapper}>
                 <CountdownCircleTimer
@@ -111,6 +215,7 @@ export const CounterDown = () => {
                 onPress={() => {
                     setIsPlaying(false)
                     setKey(prevKey => prevKey + 1)
+                    restartMessageBluetooth()
                 }} />
         </View>
     )
