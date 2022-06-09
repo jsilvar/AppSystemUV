@@ -7,18 +7,17 @@ import { COUNTER_DOWN } from '../../constants/GlobalConstant'
 //navigation
 import { useRoute } from '@react-navigation/native';
 
-import { TOAST } from '../../constants/GlobalConstant';
-
 import { ToastGeneric } from '../../components/generic/ToastGeneric';
+import PushNotification from 'react-native-push-notification';
 
 import BluetoothSerial, {
     withSubscription
 } from "react-native-bluetooth-serial-next";
 
-interface Params{
-    timerCountDown:any,
-    deviceBluetoothConnect:any,
-    luminaries:any,
+interface Params {
+    timerCountDown: any,
+    deviceBluetoothConnect: any,
+    luminaries: any,
 }
 
 export const CounterDown = () => {
@@ -35,6 +34,8 @@ export const CounterDown = () => {
     const [dateIO, setDataIO] = useState(COUNTER_DOWN.WITHOUT_DATA_SENSOR)
     const [disabledReadBluetooth, setDisabledReadBluetooth] = useState(false)
     const [idIntervalReadBluetooth, setIdIntervalReadBluetooth] = useState()
+    //enabled render time
+    const [enabledPushNotification, setEnablePushNotification] = useState(false)
     //toast
     const [typeToast, setTypeToast] = useState()
     const [titleToast, setTitleToast] = useState()
@@ -47,12 +48,23 @@ export const CounterDown = () => {
         convertTime(params)
     }, [isPlaying, timeDuration])
 
+    const handleNotification = () => {
+        PushNotification.localNotification({
+            channelId: COUNTER_DOWN.NOTIFICATION_LOCAL.ID,
+            title: COUNTER_DOWN.NOTIFICATION_LOCAL.TITLE,
+            message: COUNTER_DOWN.NOTIFICATION_LOCAL.MESSAGE,
+            bigtext: COUNTER_DOWN.NOTIFICATION_LOCAL.BIG_TEXT,
+            smallIcon: COUNTER_DOWN.NOTIFICATION_LOCAL.SMALL_ICON,
+            color: COUNTER_DOWN.NOTIFICATION_LOCAL.COLOR
+        })
+    }
+
     const formatDataSensor = (data: string) => {
         if (data === '')
             setDataIO(COUNTER_DOWN.WITHOUT_DATA_SENSOR)
-        else{
-            const dataTemp = data.substring(data.search('=')+1,data.search(','))
-            let sensorUV=parseFloat(dataTemp)*COUNTER_DOWN.CONSTANT_UV
+        else {
+            const dataTemp = data.substring(data.search('=') + 1, data.search(','))
+            let sensorUV = parseFloat(dataTemp) * COUNTER_DOWN.CONSTANT_UV
             setDataIO(COUNTER_DOWN.DATA_SENSOR.replace('{0}', sensorUV.toFixed(2).toString()))
         }
     }
@@ -99,6 +111,7 @@ export const CounterDown = () => {
             let timeTemp = parseInt(params.timerCountDown.value.minute) * 60 + parseInt(params.timerCountDown.value.second)
             console.log('time', timeTemp)
             setTimeDuration(timeTemp)
+            setEnablePushNotification(true)
         }
         else
             return 0
@@ -133,6 +146,8 @@ export const CounterDown = () => {
         if (remainingTime === 0) {
             console.log('remaining time zero', remainingTime)
             restartMessageBluetooth()
+            if (enabledPushNotification)
+                handleNotification()
             return (
                 <View style={[style.timer, { width: width * 0.4, height: width * 0.5 }]}>
                     <Spinner

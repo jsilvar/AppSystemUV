@@ -97,6 +97,16 @@ export const COUNTER_DOWN={
         TITLE:'¡Registro faliido!',
         MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
     },
+    NOTIFICATION_LOCAL:{
+        ID:'countDownSystemUV',
+        NAME_CHANNEL:'Channel System UV',
+        TITLE:'¡Tiempo Finalizado!',
+        MESSAGE:'Desinfección con UV realizada con satisfacción',
+        SMALL_ICON:'ic-launcher',
+        BIG_TEXT:'La limpieza del aula {0} con el tiempo {1}',
+        COLOR:'purple',
+        SOUND_NAME:'default'
+    }
 }
 
 export const SELECT_OPTION={

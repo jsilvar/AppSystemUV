@@ -27,6 +27,8 @@ import { LoaderGeneric } from '../components/generic/LoaderGeneric';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import PushNotification  from 'react-native-push-notification';
+
 export const BluetoothDeviceDiscoveryScreen = ({ navigation }) => {
 
     const [modalVisible, setModalVisible] = useState(false)
@@ -47,12 +49,31 @@ export const BluetoothDeviceDiscoveryScreen = ({ navigation }) => {
 
     useEffect(() => {
         console.log('from useEffect')
+        createChannels()
         //requestCameraPermission()
         //discoverUnpairedDevices()
     }, [])
 
+    const createChannels=()=>{
+        PushNotification.createChannel(
+            {
+                channelId:"test-channel",
+                channelName:'Test Channel'
+            },
+            (created)=>console.log(`createdChannel returned '${created}'`)
+        )
+    }
+
+    const handleNotification=()=>{
+        PushNotification.localNotification({
+            channelId:"test-channel",
+            title:"You clicked on",
+            message:'Define here message'
+        })
+    }
 
     const requestCameraPermission = async () => {
+        handleNotification()
         try {
 
             await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION)
