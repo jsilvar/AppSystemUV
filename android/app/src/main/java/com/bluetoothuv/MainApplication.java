@@ -4,7 +4,9 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
-import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+//import com.pilloxa.backgroundjob.BackgroundJobPackage;
+import com.asterinet.react.bgactions.BackgroundActionsPackage;
+//import com.jamesisaac.rnbackgroundtask.BackgroundTaskPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.horcrux.svg.SvgPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -38,6 +40,8 @@ public class MainApplication extends Application implements ReactApplication {
           packages.add(new RNSpinkitPackage());
           //packages.add(new VectorIconsPackage());
           //packages.add(new AsyncStoragePackage());
+          //packages.add(new BackgroundJobPackage());
+          //packages.add(new BackgroundActionsPackage());
           return packages;
         }
 
@@ -57,6 +61,8 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    //BackgroundActionsPackage.useContext(this);
+    //BackgroundTaskPackage.useContext(this);
   }
 
   /**

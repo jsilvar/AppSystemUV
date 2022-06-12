@@ -30,6 +30,7 @@ export const ScreenMain = ({navigation}:Props) => {
             <Button title='ConfigCounter' onPress={()=>onPressScreen('ConfigCounterScreen')} />
             <Button title='BluetoothConnect' onPress={()=>onPressScreen('BluetoothDeviceConnectScreen')} />
             <Button title='BluetoothDiscovery' onPress={()=>onPressScreen('BluetoothDeviceDiscoveryScreen')} />
+            <Button title='CheckBackground' onPress={()=>onPressScreen('CheckBackgroundScreen')} />
         </View>
     )
 }

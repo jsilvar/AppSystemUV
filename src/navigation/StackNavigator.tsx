@@ -11,6 +11,7 @@ import { UserInfoGeneralScreen } from '../screens/UserInfoGeneralScreen';
 import { ConfigCounterScreen } from '../screens/ConfigCounterScreen';
 import { BluetoothDeviceConnectScreen } from '../screens/BluetoothDeviceConnectScreen';
 import { BluetoothDeviceDiscoveryScreen } from '../screens/BluetoothDeviceDiscoveryScreen';
+import { CheckBackgroundTaskScreen } from '../screens/CheckBackgroundTaskScreen';
 
 export type RootStackParams = {
     //Screen2Test:undefined,
@@ -24,6 +25,7 @@ export type RootStackParams = {
     ConfigCounterScreen: undefined,
     BluetoothDeviceConnectScreen: undefined,
     BluetoothDeviceDiscoveryScreen: undefined,
+    CheckBackgroundScreen:undefined,
 }
 
 const Stack = createStackNavigator<RootStackParams>();
@@ -52,6 +54,7 @@ export const StackNavigator = ({navigation}) => {
             <Stack.Screen name='ConfigCounterScreen' options={{ title: 'ConfigCounter' }} component={ConfigCounterScreen} />
             <Stack.Screen name='BluetoothDeviceConnectScreen' component={BluetoothDeviceConnectScreen}/>
             <Stack.Screen name='BluetoothDeviceDiscoveryScreen' component={BluetoothDeviceDiscoveryScreen}/>
+            <Stack.Screen name='CheckBackgroundScreen' component={CheckBackgroundTaskScreen}/>
         </Stack.Navigator>
     )
 }

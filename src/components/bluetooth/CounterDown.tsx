@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button, useWindowDimensions } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react';
+import { Text, View, StyleSheet, Button, useWindowDimensions, AppState } from 'react-native'
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
 import Spinner from 'react-native-spinkit';
 //constant
@@ -9,6 +9,8 @@ import { useRoute } from '@react-navigation/native';
 
 import { ToastGeneric } from '../../components/generic/ToastGeneric';
 import PushNotification from 'react-native-push-notification';
+
+import BackgroundService from 'react-native-background-actions';
 
 import BluetoothSerial, {
     withSubscription
@@ -41,12 +43,110 @@ export const CounterDown = () => {
     const [titleToast, setTitleToast] = useState()
     const [messageToast, setMessageToast] = useState()
     const [visibleToast, setVisibleToast] = useState(false)
+    //appState
+    const appState = useRef(AppState.currentState)
+    const [appStateVisible, setAppStateVisible] = useState(appState.current)
+
+    const options = {
+        taskName: 'Example',
+        taskTitle: 'ExampleTask title',
+        taskDesc: 'ExampleTask description',
+        taskIcon: {
+            name: 'ic_launcher',
+            type: 'mipmap',
+        },
+        color: '#ff00ff',
+        linkingURI: 'yourSchemeHere://chat/jane', // See Deep Linking for more info
+        parameters: {
+            delay: 1000,
+        },
+    };
+
 
     useEffect(() => {
+
+        getStatusApp()
+
         setDeviceConnect(params.deviceBluetoothConnect)
         setMessageBluetooth(params.luminaries.value)
         convertTime(params)
+
     }, [isPlaying, timeDuration])
+
+    const startTask = async () => {
+        console.log('start task')
+        await BackgroundService.start(veryIntensiveTask, options);
+    }
+
+    const updateTask = async () => {
+        console.log('update task')
+        await BackgroundService.updateNotification({ taskDesc: 'New ExampleTask description' });
+    }
+
+    const stopTask = async () => {
+        console.log('stop task')
+        await BackgroundService.stop();
+    }
+
+    const sleep = (time) => new Promise((resolve) => setTimeout(() => resolve(), time));
+
+    const veryIntensiveTask = async (taskDataArguments) => {
+        // Example of an infinite loop task
+        const { delay } = taskDataArguments;
+        await new Promise(async (resolve) => {
+            for (let i = 0; BackgroundService.isRunning(); i++) {
+                console.log(i);
+                await sleep(delay);
+            }
+        });
+    };
+
+    const getStatusApp=()=>{
+        const subscription = AppState.addEventListener("change", nextAppState => {
+            if (
+                appState.current.match(/inactive|background/) &&
+                nextAppState === "active"
+            ) {
+                console.log("App has come to the foreground!");
+                stopTask()
+            }
+
+            if (
+                appState.current.match(/active/) &&
+                nextAppState === "background"
+            ) {
+                console.log("App has come to the foreground!");
+                startTask()
+            }
+
+            console.log('nextAppState', nextAppState, 'appState', appState.current)
+
+            appState.current = nextAppState;
+            setAppStateVisible(appState.current);
+            console.log("AppState", appState.current);
+        });
+
+        return () => {
+            subscription.remove();
+        };
+    }
+
+    const handleAppStateChange = (nextAppState) => {
+        if (appState.current.match(/inactive|background/) && nextAppState === 'active')
+            console.log("App has come to the foreground")
+
+        appState.current = nextAppState
+        setAppStateVisible(appState.current)
+
+        if(appState.current.match(/background/)){
+            console.log('enter background')
+            setInterval(()=>{
+                console.log('hfuasdfasdf')
+            },2000)
+        }
+
+        console.log('AppState: ',appState.current)
+    }
 
     const handleNotification = () => {
         PushNotification.localNotification({
@@ -143,6 +243,7 @@ export const CounterDown = () => {
     }
 
     const renderTime = ({ remainingTime }) => {
+        //console.log('remaining time currently', remainingTime)
         if (remainingTime === 0) {
             console.log('remaining time zero', remainingTime)
             restartMessageBluetooth()
