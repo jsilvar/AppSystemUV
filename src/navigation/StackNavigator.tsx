@@ -12,6 +12,7 @@ import { ConfigCounterScreen } from '../screens/ConfigCounterScreen';
 import { BluetoothDeviceConnectScreen } from '../screens/BluetoothDeviceConnectScreen';
 import { BluetoothDeviceDiscoveryScreen } from '../screens/BluetoothDeviceDiscoveryScreen';
 import { CheckBackgroundTaskScreen } from '../screens/CheckBackgroundTaskScreen';
+import { TestApiSystemUv } from '../screens/TestApiSystemUV';
 
 export type RootStackParams = {
     //Screen2Test:undefined,
@@ -26,6 +27,7 @@ export type RootStackParams = {
     BluetoothDeviceConnectScreen: undefined,
     BluetoothDeviceDiscoveryScreen: undefined,
     CheckBackgroundScreen:undefined,
+    TestApiSystemUV:undefined,
 }
 
 const Stack = createStackNavigator<RootStackParams>();
@@ -55,6 +57,7 @@ export const StackNavigator = ({navigation}) => {
             <Stack.Screen name='BluetoothDeviceConnectScreen' component={BluetoothDeviceConnectScreen}/>
             <Stack.Screen name='BluetoothDeviceDiscoveryScreen' component={BluetoothDeviceDiscoveryScreen}/>
             <Stack.Screen name='CheckBackgroundScreen' component={CheckBackgroundTaskScreen}/>
+            <Stack.Screen name='TestApiSystemUV' component={TestApiSystemUv}/>
         </Stack.Navigator>
     )
 }

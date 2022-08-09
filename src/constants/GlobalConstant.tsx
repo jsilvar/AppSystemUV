@@ -83,7 +83,7 @@ export const COUNTER_DOWN={
     REMAINING_TIME:'Tiempo restante',
     WITHOUT_DATA_SENSOR:'Pendiente datos sensor',
     DATA_SENSOR:'SENSOR: {0} mW/cm2',
-    CONSTANT_UV:0.1234,
+    CONSTANT_UV:1,
     RESET_LAMPS:'RESET_LAMPS',
     START_BUTTON:'INICIAR',
     PAUSE_BUTTON:'PAUSAR',
