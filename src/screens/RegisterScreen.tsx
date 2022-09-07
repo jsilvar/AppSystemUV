@@ -1,73 +1,191 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { StackScreenProps } from '@react-navigation/stack';
+import React, { useState, useRef, useEffect, useReducer } from 'react';
 import {
   View,
   Text,
   Button,
   ScrollView,
-  StyleSheet
+  StyleSheet,
+  TouchableOpacity
 } from 'react-native';
 
+//validation
+import { KEY_RULE_CONSTANT } from '../constants/validator/KeyRuleConstant';
 //config keyboard
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+//constants
+import { REGISTER_SCREEN, SELECT_OPTION } from '../constants/GlobalConstant';
+import { USERS, ROLES, CODE_HTTP, VERB_HTTP, ROLE_API, ERROR_TOKEN } from '../constants/ApiResource'
+//API
+import { PetitionAPI } from '../util/PetitionAPI'
+import { registerInitialState, RegisterReducer } from '../reducer/RegisterReducer';
+import { UserDto } from '../dto/PayloadDtoApi'
+//components
 import { LoaderGeneric } from '../components/generic/LoaderGeneric';
 import { SelectGeneric } from '../components/generic/SelectGeneric';
 import { TextInputGeneric } from '../components/generic/TextInputGeneric';
 import { ToastGeneric } from '../components/generic/ToastGeneric';
-import { REGISTER_SCREEN, SELECT_OPTION } from '../constants/GlobalConstant';
-import { KEY_RULE_CONSTANT } from '../constants/validator/KeyRuleConstant';
 
-export const RegisterScreen = () => {
+interface Props extends StackScreenProps<any, any> { };
 
+export const RegisterScreen = ({ navigation }: Props) => {
+  //visible toast and loader
+  const [visibleLoader, setVisibleLoader] = useState(false)
+  const [visibleToast, setVisibleToast] = useState(false)
+  //use validate fields
   const [validated, setValidated] = useState(0)
-  const [visible, setVisible] = useState(false)
+  const prevValidated = useRef({ validated, setValidated })
+  //use in toast
   const [titleToast, setTitleToast] = useState('')
   const [messageToast, setMessageToast] = useState('')
   const [typeToast, setTypeToast] = useState('')
-  const [fieldsForm, setFieldsForm] = useState({
-    email: { validated: false, value: '' },
-    password: { validated: false, value: '' }
-  })
-  const prevFieldsForm = useRef({ fieldsForm, setFieldsForm })
+  //used in reducer
+  const [registerState, dispatch] = useReducer(RegisterReducer, registerInitialState)
+  //roles
+  const [roles, setRoles] = useState([])
+  //call api
+  const { tokenJWT, tokenJWTUser, requestPetition } = PetitionAPI()
+  const [userDto, setUserDto] = useState<UserDto>('')
 
-
-  const isValidatedField = (obj: any) => {
-    setFieldsForm({ ...fieldsForm, ...obj })
-  }
-  const enableLogin = () => {
-    validateForm()
-
-    setVisible(true)
-
-    //Toast
-    setTypeToast(REGISTER_SCREEN.TOAST_SUCCESS)
-    setTitleToast(REGISTER_SCREEN.TOAST_REGISTER.TITLE)
-    setMessageToast(REGISTER_SCREEN.TOAST_REGISTER.MESSAGE)
-
-    //restore value visible
-    setTimeout(() => {
-      setVisible(false)
-    }, 3000)
-  }
-
-  const validateForm = () => {
-    setValidated((validated + 1))
-    console.log('LOGINSCREEN validated form', validated)
-  }
   useEffect(() => {
-
-    if (prevFieldsForm.fieldsForm !== fieldsForm)
-      console.log('validation use effect login screen', fieldsForm)
-
+    if (prevValidated.current.validated != validated && prevValidated.current.setValidated != setValidated()) {
+      console.log('validate changed: ', registerState)
+      if (registerState.numberIdentification.validated &&
+        registerState.firstName.validated &&
+        registerState.lastName.validated &&
+        registerState.email.validated &&
+        registerState.password.validated &&
+        registerState.confirmPassword.validated &&
+        registerState.role.validated
+      )
+        callRequestAPI()
+    }
     return () => {
-      prevFieldsForm.fieldsForm = fieldsForm
-      prevFieldsForm.setFieldsForm = setFieldsForm
+      prevValidated.current.validated = validated
+      prevValidated.current.setValidated = setValidated
+    }
+  }, [registerState])
+
+  useEffect(() => {
+    callGetRoles()
+  }, [])
+
+  //use toast
+  const useToast = (type: string, title: string, message: string) => {
+    setTypeToast(type)
+    setTitleToast(title)
+    setMessageToast(message)
+    setVisibleToast(true)
+    setTimeout(() => {
+      setVisibleToast(false)
+    }, 3000);
+  }
+
+  //click button login
+  const enableRegister = async () => {
+    setValidated((validated + 1))
+  }
+
+  //validate fields form
+  const isValidatedNumberIdentification = async (obj: any) => {
+    dispatch({ type: 'changeNumberIdentification', payload: obj })
+  }
+  const isValidatedFirstName = async (obj: any) => {
+    dispatch({ type: 'changeFirstName', payload: obj })
+  }
+  const isValidatedLastName = async (obj: any) => {
+    dispatch({ type: 'changeLastName', payload: obj })
+  }
+  const isValidatedEmail = async (obj: any) => {
+    dispatch({ type: 'changeEmail', payload: obj })
+  }
+  const isValidatedPassword = async (obj: any) => {
+    dispatch({ type: 'changePassword', payload: obj })
+  }
+  const isValidatedConfirmPassword = async (obj: any) => {
+    dispatch({ type: 'changeConfirmPassword', payload: obj })
+  }
+  const isValidatedRole = async (obj: any) => {
+    dispatch({ type: 'changeRole', payload: obj })
+  }
+
+  //call role api
+  const callGetRoles = async () => {
+    setVisibleLoader(true)
+    //call api
+    let { code, data } = await tokenJWT()
+    let { access_token } = data
+
+    if (code == CODE_HTTP.OK) {
+      let { code, data } = await requestPetition('get', ROLES.LIST_ROLES, access_token)
+      setVisibleLoader(false)
+      console.log("data by role: ", data)
+      let roleTemp = []
+      data.map(role => {
+        roleTemp.push(role.name)
+      })
+      setRoles(roleTemp)
+    } else {
+      setVisibleLoader(false)
+      if (code == CODE_HTTP.BAD_REQUEST && data.error_description.search(ERROR_TOKEN.BAD_CREDENTIALS) >= 0)
+        useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_BAD_CREDENTIALS.TITLE, REGISTER_SCREEN.TOAST_BAD_CREDENTIALS.MESSAGE)
+      if (code == CODE_HTTP.NOT_AUTHORIZED)
+        useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+      if (code == CODE_HTTP.FORBIDDEN)
+        useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_IS_DENIED.TITLE, REGISTER_SCREEN.TOAST_ACCESS_IS_DENIED.MESSAGE)
     }
 
-  }, [fieldsForm])
+  }
+  //call register api
+  const callRequestAPI = async () => {
+    setVisibleLoader(true)
+    //call api
+    let { code, data } = await tokenJWT()
+    let { access_token } = data
+
+    console.log('tokenUser: ', code, data)
+    if (code == CODE_HTTP.OK) {
+
+      console.log('payload', registerState)
+      const payloadUserDto = {
+        identification_number: registerState.numberIdentification.value,
+        first_name: registerState.firstName.value,
+        last_name: registerState.lastName.value,
+        email: registerState.email.value,
+        password: registerState.password.value,
+        role: registerState.role.value,
+        enabled: true
+      }
+
+      let { code, data } = await requestPetition('post', USERS.CREATE, access_token, payloadUserDto)
+      setVisibleLoader(false)
+      console.log("data by register: ", data, ' code ', code)
+      if (code == CODE_HTTP.OK && data.role == ROLE_API.ADMIN)
+        console.log("call next screen according role admin")
+      else if (code == CODE_HTTP.OK && data.role == ROLE_API.USER)
+        console.log("call next screen according role user")
+      else if (code == CODE_HTTP.ERROR_SERVER)
+        useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ERROR_SERVER.TITLE, REGISTER_SCREEN.TOAST_ERROR_SERVER.MESSAGE)
+      else if (code == CODE_HTTP.CONFLICT)
+        useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_NOT_REGISTER.TITLE, data.message)
+      else {
+        useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ROLE_NON_EXISTENT.TITLE, REGISTER_SCREEN.TOAST_ROLE_NON_EXISTENT.MESSAGE)
+      }
+    }
+    else {
+      setVisibleLoader(false)
+      if (code == CODE_HTTP.BAD_REQUEST && data.error_description.search(ERROR_TOKEN.BAD_CREDENTIALS) >= 0)
+        useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_BAD_CREDENTIALS.TITLE, REGISTER_SCREEN.TOAST_BAD_CREDENTIALS.MESSAGE)
+      if (code == CODE_HTTP.NOT_AUTHORIZED)
+        useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+      if (code == CODE_HTTP.FORBIDDEN)
+        useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_IS_DENIED.TITLE, REGISTER_SCREEN.TOAST_ACCESS_IS_DENIED.MESSAGE)
+    }
+  }
 
   return (
     <KeyboardAwareScrollView
-      contentContainerStyle={{ flex: 1 }}
+      contentContainerStyle={styles.keyboardAwareScroll}
       viewIsInsideTabBar={true}
       enableAutomaticScroll={true}
       // Doesn't work on RN 0.56 for either Android or iOS
@@ -79,86 +197,100 @@ export const RegisterScreen = () => {
       <View style={styles.container}>
         <View key='idLoader' style={styles.space}>
           <LoaderGeneric
-            visible={visible}
+            visible={visibleLoader}
           />
           <ToastGeneric
             title={titleToast}
             message={messageToast}
             type={typeToast}
-            visible={visible}
+            visible={visibleToast}
           />
         </View>
         <View key='idRegisterForm' style={styles.form}>
-          <ScrollView style={styles.scrollView}>
-            <Text style={styles.titleForm}>REGISTRAR USUARIO</Text>
-            <TextInputGeneric
-              id='firstName'
-              validated={validated}
-              textLabel={REGISTER_SCREEN.ID_NUMBER}
-              placeHolder={REGISTER_SCREEN.ID_NUMBER_WATERMARK}
-              labelRule='Número de identificación'
-              rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.EMAIL]}
-              isValidatedField={isValidatedField}
-            />
-            <TextInputGeneric
-              id='firstName'
-              validated={validated}
-              textLabel={REGISTER_SCREEN.FIRST_NAME}
-              placeHolder={REGISTER_SCREEN.FIRST_NAME_WATERMARK}
-              labelRule='nombre'
-              rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.EMAIL]}
-              isValidatedField={isValidatedField}
-            />
-            <TextInputGeneric
-              id='lastName'
-              validated={validated}
-              textLabel={REGISTER_SCREEN.LAST_NAME}
-              placeHolder={REGISTER_SCREEN.LAST_NAME_WATERMARK}
-              labelRule='apellido'
-              rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.EMAIL]}
-              isValidatedField={isValidatedField}
-            />
-            <TextInputGeneric
-              id='email'
-              validated={validated}
-              textLabel={REGISTER_SCREEN.EMAIL}
-              placeHolder={REGISTER_SCREEN.EMAIL_WATERMARK}
-              labelRule='Correo Electrónico'
-              rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.EMAIL]}
-              isValidatedField={isValidatedField}
-            />
-            <TextInputGeneric
-              id='password'
-              validated={validated}
-              textLabel={REGISTER_SCREEN.PASSWORD}
-              placeHolder={REGISTER_SCREEN.PASSWORD_WATERMARK}
-              labelRule='Contraseña'
-              rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.EMAIL]}
-              isValidatedField={isValidatedField}
-            />
-            <TextInputGeneric
-              id='confirmPassword'
-              validated={validated}
-              textLabel={REGISTER_SCREEN.CONFIRM_PASSWORD}
-              placeHolder={REGISTER_SCREEN.CONFIRM_PASSWORD_WATERMARK}
-              labelRule='Confirmar contraseña'
-              rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.EMAIL]}
-              isValidatedField={isValidatedField}
-            />
-            <SelectGeneric 
-              id='idRole'
-              validated={validated}
-              textLabel={REGISTER_SCREEN.ROLE}
-              data={SELECT_OPTION.LIST_TYPE_USER}
-              defaultValue={SELECT_OPTION.DEFAULT}
-              labelRule='rol'
-              rules={[KEY_RULE_CONSTANT.REQUIRED]}
-              isValidatedField={isValidatedField}
-            />
-            <View key='fieldLogin' style={styles.buttonField}>
-              <Button style={styles.button} onPress={enableLogin} title={REGISTER_SCREEN.BUTTON_NAME} color='#7f1ae5' />
-            </View>
-          </ScrollView>
+          <View style={styles.titleForm}>
+            <Text style={styles.textTitleForm}>REGISTRAR USUARIO</Text>
+          </View>
+          <View style={styles.mainForm}>
+            <ScrollView style={styles.scrollMainForm}>
+              <TextInputGeneric
+                id='numberIdentification'
+                validated={validated}
+                textLabel={REGISTER_SCREEN.ID_NUMBER}
+                placeHolder={REGISTER_SCREEN.ID_NUMBER_WATERMARK}
+                labelRule='Número de identificación'
+                rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.NUMBER, KEY_RULE_CONSTANT.MIN_LENGTH, KEY_RULE_CONSTANT.MAX_LENGTH]}
+                minLength={5}
+                maxLength={11}
+                isValidatedField={isValidatedNumberIdentification}
+              />
+              <TextInputGeneric
+                id='firstName'
+                validated={validated}
+                textLabel={REGISTER_SCREEN.FIRST_NAME}
+                placeHolder={REGISTER_SCREEN.FIRST_NAME_WATERMARK}
+                labelRule='nombre'
+                rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.ALPHABETICAL]}
+                isValidatedField={isValidatedFirstName}
+              />
+              <TextInputGeneric
+                id='lastName'
+                validated={validated}
+                textLabel={REGISTER_SCREEN.LAST_NAME}
+                placeHolder={REGISTER_SCREEN.LAST_NAME_WATERMARK}
+                labelRule='apellido'
+                rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.ALPHABETICAL]}
+                isValidatedField={isValidatedLastName}
+              />
+              <TextInputGeneric
+                id='email'
+                validated={validated}
+                textLabel={REGISTER_SCREEN.EMAIL}
+                placeHolder={REGISTER_SCREEN.EMAIL_WATERMARK}
+                labelRule='Correo Electrónico'
+                rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.EMAIL]}
+                isValidatedField={isValidatedEmail}
+              />
+              <TextInputGeneric
+                id='password'
+                validated={validated}
+                textLabel={REGISTER_SCREEN.PASSWORD}
+                placeHolder={REGISTER_SCREEN.PASSWORD_WATERMARK}
+                labelRule='Contraseña'
+                rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.PASSWORD, KEY_RULE_CONSTANT.MIN_LENGTH, KEY_RULE_CONSTANT.MAX_LENGTH]}
+                minLength={6}
+                maxLength={8}
+                isValidatedField={isValidatedPassword}
+              />
+              <TextInputGeneric
+                id='confirmPassword'
+                validated={validated}
+                textLabel={REGISTER_SCREEN.CONFIRM_PASSWORD}
+                placeHolder={REGISTER_SCREEN.CONFIRM_PASSWORD_WATERMARK}
+                labelRule='Confirmar contraseña'
+                rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.EQUAL_PASSWORD]}
+                equalPassword={registerState.password.value}
+                isValidatedField={isValidatedConfirmPassword}
+              />
+              <SelectGeneric
+                id='role'
+                validated={validated}
+                textLabel={REGISTER_SCREEN.ROLE}
+                data={roles}
+                defaultValue={SELECT_OPTION.DEFAULT}
+                labelRule='rol'
+                rules={[KEY_RULE_CONSTANT.REQUIRED]}
+                isValidatedField={isValidatedRole}
+              />
+            </ScrollView>
+          </View>
+          <View key='fieldLogin' style={styles.buttonForm}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={enableRegister}
+            >
+              <Text style={styles.textButton}>{REGISTER_SCREEN.BUTTON_NAME}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </KeyboardAwareScrollView>
@@ -166,68 +298,54 @@ export const RegisterScreen = () => {
 }
 
 const styles = StyleSheet.create({
-  space: {
-    //flex: 1,
-    height:1
-  },
-  titleForm: {
+  keyboardAwareScroll: {
     flex: 1,
-    fontSize: 25,
-    justifyContent: 'center',
-    alignSelf: 'center',
-    marginBottom: 10
   },
   container: {
     flex: 1,
-    backgroundColor:'cyan'
   },
   form: {
-    flex: 16,
-    backgroundColor: 'white'
+    flex: 1,
   },
-  imageLogo: {
-    alignSelf: 'center',
-    flex: 3,
+  space: {
+    height: 1
   },
-  field: {
-    flex: 2,
-  },
-  buttonField: {
-    //flex: 1,
-    justifyContent: 'center',
-  },
-  button:{
-    //height:'100%'
-  },
-  register: {
+  titleForm: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignSelf: 'center',
   },
-  textInput: {
-    borderWidth: 1,
-    borderRadius: 2,
-    borderColor: '#7f1ae5',
-    padding: 5,
-    margin: 5,
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    shadowOffset: {
-      height: 10,
-      width: 10
-    },
-    elevation: 2
+  textTitleForm: {
+    flex: 1,
+    fontSize: 25,
+  },
+  scrollMainForm: {
+    flex: 1,
+  },
+  mainForm: {
+    flex: 14,
+    justifyContent: 'space-between',
+    margin: 3
   },
   textField: {
-    margin: 2,
+    flex: 2,
   },
-  textRegister: {
-    color: 'blue',
-    textDecorationLine: 'underline'
+  buttonForm: {
+    flex: 1,
+    backgroundColor: '#af73eb',
+    fontSize: 25,
+    justifyContent: 'center',
   },
-  textError: {
-    color: 'red',
-    fontSize: 10,
-    marginLeft: 5
+  button: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#7f1ae5',
+    justifyContent: 'center',
+  },
+  textButton: {
+    fontSize: 25,
+    color: 'white',
+    justifyContent: 'center',
+    alignSelf: 'center',
   }
 })

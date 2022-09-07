@@ -23,6 +23,7 @@ export const LOGIN_SCREEN = {
     PATH_LOGO: require('../images/water.jpg'),
     BUTTON_NAME: 'Ingresar',
     REGISTER:'Regístrese aquí',
+    FORGOT_PASSWORD:'¿Olvidó su contraseña?',
     TOAST_SUCCESS:'success',
     TOAST_ERROR:'error',
     TOAST_REGISTER:{
@@ -30,8 +31,24 @@ export const LOGIN_SCREEN = {
         MESSAGE:'Su registro se procesó exitosamente.'
     },
     TOAST_NOT_REGISTER:{
-        TITLE:'¡Registro faliido!',
+        TITLE:'¡Registro fallido!',
         MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
+    },
+    TOAST_ACCESS_TOKEN_EXPIRED:{
+        TITLE:'¡Registro fallido!',
+        MESSAGE:'Su sesión ha finalizado.'
+    },
+    TOAST_BAD_CREDENTIALS:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Credenciales inválidas. Ingrese nuavemente su email y contraseña registrados.'
+    },
+    TOAST_ACCESS_IS_DENIED:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'No está autorizado para este recurso del backend.'
+    },
+    TOAST_ROLE_NON_EXISTENT:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Rol no registrado previamente. Contacte su administrador.'
     }
 }
 
@@ -51,7 +68,7 @@ export const REGISTER_SCREEN = {
     CONFIRM_PASSWORD_WATERMARK: 'Digite confirmación de contraseña',
     ROLE_WATERMARK: 'Rol:',
     PATH_LOGO: require('../images/water.jpg'),
-    BUTTON_NAME: 'Ingresar',
+    BUTTON_NAME: 'REGISTRAR',
     REGISTER:'Regístrese aquí',
     TOAST_SUCCESS:'success',
     TOAST_ERROR:'error',
@@ -60,9 +77,146 @@ export const REGISTER_SCREEN = {
         MESSAGE:'Su registro se procesó exitosamente.'
     },
     TOAST_NOT_REGISTER:{
-        TITLE:'¡Registro faliido!',
+        TITLE:'¡Registro fallido!',
         MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
     },
+    TOAST_ACCESS_TOKEN_EXPIRED:{
+        TITLE:'¡Registro fallido!',
+        MESSAGE:'Su sesión ha finalizado.'
+    },
+    TOAST_BAD_CREDENTIALS:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Credenciales inválidas. Ingrese nuavemente su email y contraseña registrados.'
+    },
+    TOAST_ACCESS_IS_DENIED:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'No está autorizado para este recurso del backend.'
+    },
+    TOAST_ROLE_NON_EXISTENT:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Rol no registrado previamente. Contacte su administrador.'
+    },
+    TOAST_ERROR_SERVER:{
+        TITLE:'¡Error interno!',
+        MESSAGE:'Error interno en el backend. Contacte su administrador.'
+    }
+}
+
+export const CHANGE_PASSWORD_SCREEN = {
+    ID_NUMBER: 'NÚMERO DE IDENTIFICACIÓN:',
+    TITLE:'¿Olvido su contraseña? Ingrese el correo registrado en la plataforma',
+    SUBTITLE:'Se confirmó el pin para el correo: ${email}. Digite su contraseña.',
+    CELL_COUNT:6,
+    EMAIL: 'CORREO ELECTRÓNICO:',
+    FIRST_NAME: 'NOMBRE(S):',
+    LAST_NAME: 'APELLIDO(S):',
+    PASSWORD: 'CONTRASEÑA:',
+    CONFIRM_PASSWORD: 'CONFIRMAR CONTRASEÑA:',
+    ROLE: 'ROL:',
+    ID_NUMBER_WATERMARK: 'Digite su número de identificación',
+    EMAIL_WATERMARK: 'Digite su correo electrónico',
+    FIRST_NAME_WATERMARK: 'Digite su(s) nombre(s)',
+    LAST_NAME_WATERMARK: 'Digite su(s) apellido(s)',
+    PASSWORD_WATERMARK: 'Digite su contraseña',
+    CONFIRM_PASSWORD_WATERMARK: 'Digite confirmación de contraseña',
+    ROLE_WATERMARK: 'Rol:',
+    PATH_LOGO: require('../images/water.jpg'),
+    BUTTON_NAME: 'SOLICITAR PIN',
+    CHANGE_PASSWORD_BUTTON_NAME:'CAMBIAR CONTRASEÑA',
+    REGISTER:'Regístrese aquí',
+    MODAL:{
+        TITLE:'DIGITE PIN ENVIADO A SU CORREO',
+        CLOSE_BUTTON:'CERRAR',
+        VALIDATION_BUTTON:'VALIDAR',
+        GET_PIN_BUTTON:'NUEVO PIN'
+    },
+    TOAST_SUCCESS:'success',
+    TOAST_ERROR:'error',
+    TOAST_SEND_PIN:{
+        TITLE:'¡Pin enviado!',
+        MESSAGE:'El pin se envió al correo registrado.'
+    },
+    TOAST_CONFIRM_PIN:{
+        TITLE:'¡Pin confirmado!',
+        MESSAGE:'El pin se confirmo exitosamente.'
+    },
+    TOAST_CHANGE_PASSWORD:{
+        TITLE:'¡Contraseña modificada!',
+        MESSAGE:'Su contraseña se modificó satisfactoriamente.'
+    },
+    TOAST_NOT_REGISTER:{
+        TITLE:'¡Registro fallido!',
+        MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
+    },
+    TOAST_ACCESS_TOKEN_EXPIRED:{
+        TITLE:'¡Expiró la sesión!',
+        MESSAGE:'Ingrese nuevamente desde el inicio de sesión.'
+    },
+    TOAST_BAD_CREDENTIALS:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Credenciales inválidas. Ingrese nuavemente su email y contraseña registrados.'
+    },
+    TOAST_ACCESS_IS_DENIED:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'No está autorizado para este recurso del backend.'
+    },
+    TOAST_ROLE_NON_EXISTENT:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Rol no registrado previamente. Contacte su administrador.'
+    },
+    TOAST_ERROR_SERVER:{
+        TITLE:'¡Error interno!',
+        MESSAGE:'Error interno en el backend. Contacte su administrador.'
+    },
+    TOAST_ERROR_NOT_FOUND:{
+        TITLE:'¡Error interno!',
+        MESSAGE:'Error del API no parametrizado. Contacte su administrador.'
+    },
+    TOAST_NOT_FOUND:{
+        TITLE:'¡Pin no encontrado!',
+        MESSAGE:'Constate el pin enviado al correo registrado.'
+    }
+}
+
+export const VALIDATE_SCREEN = {
+    TITLE:'Ingrese el pin enviado al correo registrado. Constate también su spam.',
+    CELL_COUNT:6,
+    PATH_LOGO: require('../images/water.jpg'),
+    BUTTON_NAME: 'VALIDAR PIN',
+    TOAST_SUCCESS:'success',
+    TOAST_ERROR:'error',
+    TOAST_RVALIDATE_PIN:{
+        TITLE:'¡Pin correcto!',
+        MESSAGE:'Su pin se ha validado exitosamente.'
+    },
+    TOAST_NOT_REGISTER:{
+        TITLE:'¡Solicitud fallida!',
+        MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
+    },
+    TOAST_ACCESS_TOKEN_EXPIRED:{
+        TITLE:'¡Solicitud fallida!',
+        MESSAGE:'Su sesión ha finalizado.'
+    },
+    TOAST_BAD_CREDENTIALS:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Credenciales inválidas. Ingrese nuavemente su email y contraseña registrados.'
+    },
+    TOAST_ACCESS_IS_DENIED:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'No está autorizado para este recurso del backend.'
+    },
+    TOAST_ROLE_NON_EXISTENT:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Rol no registrado previamente. Contacte su administrador.'
+    },
+    TOAST_ERROR_SERVER:{
+        TITLE:'¡Error interno!',
+        MESSAGE:'Error interno en el backend. Contacte su administrador.'
+    },
+    TOAST_NOT_FOUND:{
+        TITLE:'¡Pin no encontrado!',
+        MESSAGE:'Constate el pin enviado al correo registrado.'
+    }
 }
 
 export const USER_INFO_GENERAL_SCREEN={

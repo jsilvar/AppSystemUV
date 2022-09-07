@@ -6,6 +6,7 @@ import { ScreenMain } from '../screens/ScreenMain';
 import { SplashScreen } from '../screens/SplashScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { RegisterScreen } from '../screens/RegisterScreen';
+import { ValidatePinScreen } from '../screens/ValidatePinScreen';
 import { CounterBluetoothScreen } from '../screens/CounterBluetoothScreen';
 import { UserInfoGeneralScreen } from '../screens/UserInfoGeneralScreen';
 import { ConfigCounterScreen } from '../screens/ConfigCounterScreen';
@@ -13,6 +14,8 @@ import { BluetoothDeviceConnectScreen } from '../screens/BluetoothDeviceConnectS
 import { BluetoothDeviceDiscoveryScreen } from '../screens/BluetoothDeviceDiscoveryScreen';
 import { CheckBackgroundTaskScreen } from '../screens/CheckBackgroundTaskScreen';
 import { TestApiSystemUv } from '../screens/TestApiSystemUV';
+import { ChangePasswordScreen } from '../screens/ChangePasswordScreen';
+
 
 export type RootStackParams = {
     //Screen2Test:undefined,
@@ -21,6 +24,8 @@ export type RootStackParams = {
     LoginScreen: undefined,
     SplashScreen: undefined,
     RegisterScreen: undefined,
+    ValidatePinScreen:undefined,
+    ChangePasswordScreen:undefined,
     CounterScreen: undefined,
     UserInfoGeneralScreen: undefined,
     ConfigCounterScreen: undefined,
@@ -51,6 +56,8 @@ export const StackNavigator = ({navigation}) => {
             <Stack.Screen name='SplashScreen' options={{ title: 'Splash', headerShown: false }} component={SplashScreen} />
             <Stack.Screen name='LoginScreen' options={{ title: 'Login' }} component={LoginScreen} />
             <Stack.Screen name='RegisterScreen' options={{ title: 'register' }} component={RegisterScreen} />
+            <Stack.Screen name='ValidatePinScreen' options={{ title: 'validatePin' }} component={ValidatePinScreen} />
+            <Stack.Screen name='ChangePasswordScreen' options={{ title: 'changePassword' }} component={ChangePasswordScreen} />
             <Stack.Screen name='CounterScreen' options={{ title: 'counter' }} component={CounterBluetoothScreen} />
             <Stack.Screen name='UserInfoGeneralScreen' options={{ title: 'UserInfoGeneral' }} component={UserInfoGeneralScreen} />
             <Stack.Screen name='ConfigCounterScreen' options={{ title: 'ConfigCounter' }} component={ConfigCounterScreen} />

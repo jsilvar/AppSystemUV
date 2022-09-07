@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useReducer } from 'react';
 import {
     View,
     Text,
@@ -16,6 +16,7 @@ import LABELS_CONSTANT from '../../constants/validator/LabelsConstant';
 
 import { LOGIN_SCREEN, SPLASH_SCREEN } from '../../constants/GlobalConstant';
 import { useLinkProps } from '@react-navigation/native';
+import { loginInitialState, LoginReducer } from '../../reducer/LoginReducer';
 
 interface Props {
     id: string;
@@ -25,6 +26,9 @@ interface Props {
     rules: Array<string>;
     placeHolder: string;
     secure?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    equalPassword?: string;
     isValidatedField(obj: any): void;
 }
 
@@ -36,6 +40,7 @@ export const TextInputGeneric = (props: Props) => {
     const [validated, setvalidated] = useState(0)
     const [idTextGeneric, setIdTextGeneric] = useState('')
     const prevIdTextGeneric = useRef({ idTextGeneric, setIdTextGeneric }).current;
+    const [equalPassword, setEqualPassword] = useState(props.equalPassword)
 
     //rule array adding default value: 'idTextGeneric'
     const [rules, setRules] = useState(props.rules)
@@ -78,7 +83,14 @@ export const TextInputGeneric = (props: Props) => {
     const getInitialValidateField = () => {
         const finalArray = [];
         rules.map(ruleCustomer => {
-            finalArray.push([ruleCustomer, true])
+            if (ruleCustomer == 'minlength')
+                finalArray.push([ruleCustomer, props.minLength != null ? props.minLength : 0])
+            else if (ruleCustomer == 'maxlength')
+                finalArray.push([ruleCustomer, props.maxLength != null ? props.maxLength : 0])
+            else if (ruleCustomer == 'equalPassword')
+                finalArray.push([ruleCustomer, {equalPassword}])
+            else
+                finalArray.push([ruleCustomer, true])
         })
         return Object.fromEntries(new Map(finalArray))
     }
@@ -103,12 +115,10 @@ export const TextInputGeneric = (props: Props) => {
 
     useEffect(() => {
         if (props.validated !== validated) {
-            console.log('change validated')
             setvalidated(props.validated)
             validateForm()
         }
         if (idTextGeneric !== prevIdTextGeneric.idTextGeneric) {
-            console.log('change idTextGeneric')
             validateForm()
         }
         return () => {
@@ -117,16 +127,30 @@ export const TextInputGeneric = (props: Props) => {
         }
     }, [props.validated, idTextGeneric])
 
+    useEffect(() => {
+      if(props.equalPassword!=equalPassword){
+        setEqualPassword(props.equalPassword)
+      }
+    }, [props.equalPassword])
 
-    const validateForm = () => {
-        if (!props.validated) {
-            props.isValidatedField(JSON.parse(`{"${id}":{"validated":"false,"value":"${idTextGeneric}"}}`))
+    useEffect(() => {
+        validateForm()
+    }, [equalPassword])
+    
+    const validateForm = async () => {
+        if (props.validated==0) {
+            props.isValidatedField(JSON.parse(`{"validated":false,"value":"${idTextGeneric}"}`))
         }
         else {
             //validate form
-            const validateForm = validate({ idTextGeneric: validateField });
+            let validateForm
+            if(props.equalPassword== undefined)
+                validateForm = await validate({ idTextGeneric: validateField })
+            else{
+                validateForm = await validate({ idTextGeneric: {required:true, equalPassword:equalPassword} })
+            }
             //inform parent of update
-            props.isValidatedField(JSON.parse(`{"${id}":{"validated":${validateForm},"value":"${idTextGeneric}"}}`))
+            props.isValidatedField(JSON.parse(`{"validated":${validateForm},"value":"${idTextGeneric}"}`))
         }
     }
 
@@ -156,10 +180,10 @@ export const TextInputGeneric = (props: Props) => {
     )
 }
 
-
 const styles = StyleSheet.create({
     field: {
         flex: 2,
+        marginBottom:2
     },
     textInput: {
         borderWidth: 1,
@@ -177,6 +201,7 @@ const styles = StyleSheet.create({
     },
     textField: {
         margin: 2,
+        fontSize:15,
     },
     textRegister: {
         color: 'blue',

@@ -25,6 +25,8 @@ export const ScreenMain = ({navigation}:Props) => {
             <Button title='splash' onPress={()=>onPressScreen('SplashScreen')}  />
             <Button title='login' onPress={()=>onPressScreen('LoginScreen')} />
             <Button title='register' onPress={()=>onPressScreen('RegisterScreen')} />
+            <Button title='validatePin' onPress={()=>onPressScreen('ValidatePinScreen')} />
+            <Button title='changePassword' onPress={()=>onPressScreen('ChangePasswordScreen')} />
             <Button title='counter' onPress={()=>onPressScreen('CounterScreen')} />
             <Button title='userInfo' onPress={()=>onPressScreen('UserInfoGeneralScreen')} />
             <Button title='ConfigCounter' onPress={()=>onPressScreen('ConfigCounterScreen')} />

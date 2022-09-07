@@ -98,12 +98,10 @@ export const SelectGeneric = (props: Props) => {
 
     useEffect(() => {
         if (props.validated !== validated) {
-            console.log('change validated')
             setvalidated(props.validated)
             validateForm()
         }
         if (idTextGeneric !== prevIdTextGeneric.idTextGeneric) {
-            console.log('change idTextGeneric')
             validateForm()
         }
         return () => {
@@ -115,12 +113,10 @@ export const SelectGeneric = (props: Props) => {
 
     const validateForm = () => {
         if (!props.validated) return
-
-        console.log('validate form')
         //validate form
         const validateForm = validate({ idTextGeneric: validateField });
         //inform parent of update
-        props.isValidatedField(JSON.parse(`{"${id}":{"validated":${validateForm},"value":"${idTextGeneric}"}}`))
+        props.isValidatedField(JSON.parse(`{"validated":${validateForm},"value":"${idTextGeneric}"}`))
     }
 
     return (
@@ -135,13 +131,11 @@ export const SelectGeneric = (props: Props) => {
                 buttonTextAfterSelection={(selectedItem, index) => {
                     // text represented after item is selected
                     // if data array is an array of objects then return selectedItem.property to render after item is selected
-                    console.log('button after selection', selectedItem, index)
                     return selectedItem
                 }}
                 rowTextForSelection={(item, index) => {
                     // text represented for each item in dropdown
                     // if data array is an array of objects then return item.property to represent item in dropdown
-                    console.log('text for selection', item, index)
                     return item
                 }}
                 defaultButtonText={props.defaultValue}

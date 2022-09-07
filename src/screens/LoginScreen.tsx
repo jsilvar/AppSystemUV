@@ -1,5 +1,5 @@
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useReducer } from 'react';
 import {
     View,
     Text,
@@ -11,94 +11,161 @@ import {
 
 //validation
 import { KEY_RULE_CONSTANT } from '../constants/validator/KeyRuleConstant';
-
 //config keyboard
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 //constants
 import { LOGIN_SCREEN, SPLASH_SCREEN } from '../constants/GlobalConstant';
+import { USERS, CODE_HTTP, VERB_HTTP, ROLE_API, ERROR_TOKEN } from '../constants/ApiResource'
+//API
+import { PetitionAPI } from '../util/PetitionAPI'
+import { loginInitialState, LoginReducer } from '../reducer/LoginReducer';
+//components
 import { LoaderGeneric } from '../components/generic/LoaderGeneric';
-
 import { TextInputGeneric } from '../components/generic/TextInputGeneric';
-
-
-import ModalGeneric from '../components/bluetooth/ModalGeneric';
 import { ToastGeneric } from '../components/generic/ToastGeneric';
-
 
 interface Props extends StackScreenProps<any, any> { };
 
 export const LoginScreen = ({ navigation }: Props) => {
-
-    const [visible, setVisible] = useState(false)
+    //visible toast and loader
+    const [visibleLoader, setVisibleLoader] = useState(false)
+    const [visibleToast, setVisibleToast] = useState(false)
+    //used validate fields
     const [validated, setValidated] = useState(0)
-    const [fieldsForm, setFieldsForm] = useState({
-        email: { validated: false, value: '' },
-        password: { validated: false, value: '' }
-    })
-    const prevFieldsForm = useRef({ fieldsForm, setFieldsForm })
+    const prevValidated = useRef({ validated, setValidated })
+    //use in toast
     const [titleToast, setTitleToast] = useState('')
     const [messageToast, setMessageToast] = useState('')
     const [typeToast, setTypeToast] = useState('')
+    //used in reducer
+    const [loginState, dispatch] = useReducer(LoginReducer, loginInitialState)
+    //call api
+    const { tokenJWTUser, requestPetition } = PetitionAPI()
+    const [validateCallAPI, setValidateCallAPI] = useState(0)
 
     useEffect(() => {
-
-        if (prevFieldsForm.fieldsForm !== fieldsForm)
-            console.log('validation use effect login screen', fieldsForm)
-
-        return () => {
-            prevFieldsForm.fieldsForm = fieldsForm
-            prevFieldsForm.setFieldsForm = setFieldsForm
+        if (loginState.email.validated && loginState.password.validated
+            && prevValidated.current.validated != validated) {
+            prevValidated.current.validated = validated
+            setValidateCallAPI(validateCallAPI + 1)
         }
+    }, [loginState])
 
-    }, [fieldsForm])
+    useEffect(() => {
+        if (prevValidated.current.validated != validated) {
+            if (loginState.email.validated && loginState.password.validated) {
+                prevValidated.current.validated = validated
+                setValidateCallAPI(validateCallAPI + 1)
+            }
+        }
+        else if (!loginState.email.validated || !loginState.password.validated)
+            prevValidated.current.validated = validated
+    }, [validated])
 
+    useEffect(() => {
+        if (validateCallAPI == 1)
+            callLoginAPI()
+    }, [validateCallAPI])
+
+    //use toast
+    const useToast = (type: string, title: string, message: string) => {
+        setTypeToast(type)
+        setTitleToast(title)
+        setMessageToast(message)
+        setVisibleToast(true)
+        setTimeout(() => {
+            setVisibleToast(false)
+        }, 3000);
+    }
+
+    //Go to screen RegisterScreen or ForgotPasswordScreen
     const enableRegisterScreen = () => {
         navigation.navigate('RegisterScreen')
     }
 
-    const enableLogin = () => {
-        validateForm()
-
-        setVisible(true)
-
-        //Toast
-        setTypeToast(LOGIN_SCREEN.TOAST_SUCCESS)
-        setTitleToast(LOGIN_SCREEN.TOAST_REGISTER.TITLE)
-        setMessageToast(LOGIN_SCREEN.TOAST_REGISTER.MESSAGE)
-
-        //restore value visible
-        setTimeout(() => {
-            setVisible(false)
-        }, 3000)
+    const enableFortgotPasswordScreen = () => {
+        navigation.navigate('RegisterScreen')
     }
 
-    const validateForm = () => {
+    //click button login
+    const enableLogin = async () => {
         setValidated((validated + 1))
-        console.log('LOGINSCREEN validated form', validated)
     }
 
-    const isValidatedField = (obj: any) => {
-        setFieldsForm({ ...fieldsForm, ...obj })
+    //validate fields form
+    const isValidatedEmail = async (obj: any) => {
+        dispatch({ type: 'changeEmail', payload: obj })
+    }
+    const isValidatedPassword = async (obj: any) => {
+        dispatch({ type: 'changePassword', payload: obj })
     }
 
+    //call login api
+    const callLoginAPI = async () => {
+
+        if (validateCallAPI != 1) {
+            console.log('not execute')
+            setTimeout(() => {
+                setValidateCallAPI(0)
+            }, 1000);
+            return
+        }
+        else {
+
+            console.log('\nexecute function...\n')
+
+            setVisibleLoader(true)
+            //call api
+            let { code, data } = await tokenJWTUser(loginState.email.value, loginState.password.value)
+            let { access_token } = data
+
+            console.log('tokenUser: ', code, data)
+            if (code == CODE_HTTP.OK) {
+                let { code, data } = await requestPetition('get', USERS.GET_USER_BY_EMAIL.replace('${email}', loginState.email.value), access_token)
+                setVisibleLoader(false)
+                console.log("data by email: ", data)
+                if (code == CODE_HTTP.OK && data.role == ROLE_API.ADMIN)
+                    console.log("call next screen according role admin")
+                else if (code == CODE_HTTP.OK && data.role == ROLE_API.USER)
+                    console.log("call next screen according role user")
+                else {
+                    useToast(LOGIN_SCREEN.TOAST_ERROR, LOGIN_SCREEN.TOAST_ROLE_NON_EXISTENT.TITLE, LOGIN_SCREEN.TOAST_ROLE_NON_EXISTENT.MESSAGE)
+                }
+            }
+            else {
+                setVisibleLoader(false)
+                if (code == CODE_HTTP.BAD_REQUEST && data.error_description.search(ERROR_TOKEN.BAD_CREDENTIALS) >= 0)
+                    useToast(LOGIN_SCREEN.TOAST_ERROR, LOGIN_SCREEN.TOAST_BAD_CREDENTIALS.TITLE, LOGIN_SCREEN.TOAST_BAD_CREDENTIALS.MESSAGE)
+                if (code == CODE_HTTP.NOT_AUTHORIZED)
+                    useToast(LOGIN_SCREEN.TOAST_ERROR, LOGIN_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, LOGIN_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+                if (code == CODE_HTTP.FORBIDDEN)
+                    useToast(LOGIN_SCREEN.TOAST_ERROR, LOGIN_SCREEN.TOAST_ACCESS_IS_DENIED.TITLE, LOGIN_SCREEN.TOAST_ACCESS_IS_DENIED.MESSAGE)
+            }
+            
+            setTimeout(() => {
+                setValidateCallAPI(0)
+            }, 1000);
+        }
+    }
+
+    //render views
     return (
         <KeyboardAwareScrollView
             contentContainerStyle={{ flex: 1 }}
             viewIsInsideTabBar={true}
             enableAutomaticScroll={true}
-            extraHeight='-50'
         >
             <View style={styles.container}>
 
                 <View key='idLoader' style={styles.space}>
                     <LoaderGeneric
-                        visible={visible}
+                        visible={visibleLoader}
                     />
                     <ToastGeneric
                         title={titleToast}
                         message={messageToast}
                         type={typeToast}
-                        visible={visible}
+                        visible={visibleToast}
                     />
                 </View>
                 <View key='idLoginForm' style={styles.form}>
@@ -115,7 +182,7 @@ export const LoginScreen = ({ navigation }: Props) => {
                         placeHolder={LOGIN_SCREEN.EMAIL_WATERMARK}
                         labelRule='Correo Electrónico'
                         rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.EMAIL]}
-                        isValidatedField={isValidatedField}
+                        isValidatedField={isValidatedEmail}
                     />
                     <TextInputGeneric
                         id='password'
@@ -123,20 +190,28 @@ export const LoginScreen = ({ navigation }: Props) => {
                         textLabel={LOGIN_SCREEN.PASSWORD}
                         placeHolder={LOGIN_SCREEN.PASSWORD_WATERMARK}
                         labelRule='Contraseña'
-                        rules={[KEY_RULE_CONSTANT.REQUIRED]}
-                        isValidatedField={isValidatedField}
+                        rules={[KEY_RULE_CONSTANT.REQUIRED, KEY_RULE_CONSTANT.PASSWORD, KEY_RULE_CONSTANT.MIN_LENGTH, KEY_RULE_CONSTANT.MAX_LENGTH]}
+                        isValidatedField={isValidatedPassword}
+                        minLength={6}
+                        maxLength={8}
                         secure={true}
                     />
                     <View key='fieldLogin' style={styles.buttonField}>
                         <Button onPress={enableLogin} title={LOGIN_SCREEN.BUTTON_NAME} color='#7f1ae5' />
                     </View>
-                    <View key='fieldRegister' style={styles.register}>
-                        <TouchableOpacity onPress={enableRegisterScreen}>
-                            <Text style={styles.textRegister}>{LOGIN_SCREEN.REGISTER}</Text>
-                        </TouchableOpacity>
+                    <View style={{ flexDirection: 'row' }}>
+                        <View key='fieldRegister' style={styles.register}>
+                            <TouchableOpacity onPress={enableRegisterScreen}>
+                                <Text style={styles.textRegister}>{LOGIN_SCREEN.REGISTER}</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View key='fieldForgotPassword' style={styles.forgotPassword}>
+                            <TouchableOpacity onPress={enableFortgotPasswordScreen}>
+                                <Text style={styles.textRegister}>{LOGIN_SCREEN.FORGOT_PASSWORD}</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
-                <View key='idSpace' style={styles.space}></View>
             </View>
         </KeyboardAwareScrollView>
     )
@@ -151,12 +226,12 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     form: {
-        flex: 6,
+        flex: 5,
         backgroundColor: 'white'
     },
     imageLogo: {
         alignSelf: 'center',
-        flex: 3,
+        flex: 4,
     },
     field: {
         flex: 2,
@@ -166,7 +241,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     register: {
-        flex: 1,
+        flex: 0.5,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    forgotPassword: {
+        flex: 0.5,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -189,7 +269,7 @@ const styles = StyleSheet.create({
     },
     textRegister: {
         color: 'blue',
-        textDecorationLine: 'underline'
+        //textDecorationLine: 'underline'
     },
     textError: {
         color: 'red',

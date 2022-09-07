@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { StackScreenProps } from '@react-navigation/stack';
 //storage
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserDto } from '../dto/PayloadDtoApi';
 
 const luminariesExample = {
   LAMP1: { l1: true, l2: false, l3: false, l4: false, l5: false, l6: false, l7: false },
@@ -35,6 +36,10 @@ export const useConfigCounterScreen = (navigation) => {
 
   //const visible loader and toast
   const [visible, setVisible] = useState(false)
+    const [visibleLoader, setVisibleLoader] = useState(false)
+    const [visibleToast, setVisibleToast] = useState(false)
+    const [visiblePinModal, setVisiblePinModal] = useState(false)
+    const [visibleFormPassword, setVisibleFormPassword] = useState(false)
   //const toast
   const [titleToast, setTitleToast] = useState('')
   const [messageToast, setMessageToast] = useState('')
@@ -58,6 +63,70 @@ export const useConfigCounterScreen = (navigation) => {
     luminaries: { validated: false, value: '' },
     timerCountDown: { validated: false, value: '' }
   })
+
+  //roles
+  const [roles, setRoles] = useState([])
+  //call api
+  const { tokenJWT, tokenJWTUser, requestPetition } = PetitionAPI()
+  const [userDto, setUserDto] = useState<UserDto>('')
+
+    //use toast
+    const useToast = (type: string, title: string, message: string) => {
+      setTypeToast(type)
+      setTitleToast(title)
+      setMessageToast(message)
+      setVisibleToast(true)
+      setTimeout(() => {
+        setVisibleToast(false)
+      }, 3000);
+    }
+    
+    //call register api
+    const callGeneratePinAPI = async () => {
+      setVisibleLoader(true)
+      //call api
+      let { code, data } = await tokenJWT()
+      let { access_token } = data
+  
+  
+      if (code == CODE_HTTP.OK) {
+        let { code, data } = await requestPetition(
+          VERB_HTTP.GET, LOGIN.GENERATE_PIN.replace('${email}', registerState.email.value), access_token)
+        setVisibleLoader(false)
+        if (code == CODE_HTTP.ACCEPTED) {
+          setVisiblePinModal(true)
+          useToast(CHANGE_PASSWORD_SCREEN.TOAST_SUCCESS, CHANGE_PASSWORD_SCREEN.TOAST_SEND_PIN.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_SEND_PIN.MESSAGE)
+        }
+        else
+          errorResponseCallApi(code, data)
+      }
+      else
+        errorCallApi(code, data)
+    }
+
+  const errorResponseCallApi = (code: string, data: any) => {
+    if (code == CODE_HTTP.ERROR_SERVER)
+      useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ERROR_SERVER.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ERROR_SERVER.MESSAGE)
+    else if (code == CODE_HTTP.CONFLICT)
+      useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_NOT_REGISTER.TITLE, data.message)
+    else if (code == CODE_HTTP.NOT_FOUND)
+      useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_NOT_FOUND.TITLE, data.message)
+    else {
+      useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ROLE_NON_EXISTENT.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ROLE_NON_EXISTENT.MESSAGE)
+    }
+  }
+
+  const errorCallApi = (code: string, data: any) => {
+    setVisibleLoader(false)
+    if (code == CODE_HTTP.BAD_REQUEST && data.error_description.search(ERROR_TOKEN.BAD_CREDENTIALS) >= 0)
+      useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_BAD_CREDENTIALS.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_BAD_CREDENTIALS.MESSAGE)
+    else if (code == CODE_HTTP.NOT_AUTHORIZED)
+      useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+    else if (code == CODE_HTTP.FORBIDDEN)
+      useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_IS_DENIED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_IS_DENIED.MESSAGE)
+    else
+      useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ERROR_NOT_FOUND.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ERROR_NOT_FOUND.MESSAGE)
+  }
 
   const getAsyncStorage = async () => {
     try {
