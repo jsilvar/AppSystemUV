@@ -14,7 +14,7 @@ import { KEY_RULE_CONSTANT } from '../constants/validator/KeyRuleConstant';
 //config keyboard
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 //constants
-import { REGISTER_SCREEN, SELECT_OPTION } from '../constants/GlobalConstant';
+import { REGISTER_SCREEN, SELECT_OPTION, SCREEN_APP } from '../constants/GlobalConstant';
 import { USERS, ROLES, CODE_HTTP, VERB_HTTP, ROLE_API, ERROR_TOKEN } from '../constants/ApiResource'
 //API
 import { PetitionAPI } from '../util/PetitionAPI'
@@ -161,13 +161,17 @@ export const RegisterScreen = ({ navigation }: Props) => {
       setVisibleLoader(false)
       console.log("data by register: ", data, ' code ', code)
       if (code == CODE_HTTP.OK && data.role == ROLE_API.ADMIN)
-        console.log("call next screen according role admin")
+        navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
       else if (code == CODE_HTTP.OK && data.role == ROLE_API.USER)
-        console.log("call next screen according role user")
+        navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
       else if (code == CODE_HTTP.ERROR_SERVER)
         useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ERROR_SERVER.TITLE, REGISTER_SCREEN.TOAST_ERROR_SERVER.MESSAGE)
       else if (code == CODE_HTTP.CONFLICT)
         useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_NOT_REGISTER.TITLE, data.message)
+      else if (code == CODE_HTTP.NOT_AUTHORIZED){
+          useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+          navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
+      }
       else {
         useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ROLE_NON_EXISTENT.TITLE, REGISTER_SCREEN.TOAST_ROLE_NON_EXISTENT.MESSAGE)
       }
@@ -180,6 +184,10 @@ export const RegisterScreen = ({ navigation }: Props) => {
         useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
       if (code == CODE_HTTP.FORBIDDEN)
         useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_IS_DENIED.TITLE, REGISTER_SCREEN.TOAST_ACCESS_IS_DENIED.MESSAGE)
+      if (code == CODE_HTTP.NOT_AUTHORIZED){
+          useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+          navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
+      }
     }
   }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useContext } from 'react'
 import {
     View,
     Text,
@@ -15,18 +15,31 @@ import Toast from 'react-native-toast-message';
 import { ToastGeneric } from '../components/generic/ToastGeneric';
 import EnabledBluetooth from '../components/bluetooth/EnabledBluetooth';
 import { DeviceList } from '../components/bluetooth/DeviceList';
-import { GLOBAL_CONSTANT } from '../constants/GlobalConstant';
+import { GLOBAL_CONSTANT, SCREEN_APP } from '../constants/GlobalConstant';
 
-//this line
-import ConstantTest from '../constants/DeviceTest'
 import ModalGeneric from '../components/bluetooth/ModalGeneric';
 //navigation
 import { useRoute } from '@react-navigation/native';
 import { LoaderGeneric } from '../components/generic/LoaderGeneric';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+//constant
+import {BLUETOOTH_DEVICE_CONNECT_SCREEN} from '../constants/GlobalConstant';
 
-export const BluetoothDeviceConnectScreen = ({ navigation }) => {
+//use memory to cellphone
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../context/AuthContext';
+import { StackScreenProps } from '@react-navigation/stack';
+
+interface IDeviceType extends StackScreenProps<any, any>{
+    address:string|undefined;
+    class:number|undefined;
+    connected:number|undefined;
+    id:string|undefined;
+    name:string|undefined;
+    paired:string|undefined;
+}
+
+export const BluetoothDeviceConnectScreen = ({ navigation }:IDeviceType) => {
 
     const [modalVisible, setModalVisible] = useState(false)
     const [visibleLoading, setVisibleLoading] = useState(false)
@@ -37,37 +50,40 @@ export const BluetoothDeviceConnectScreen = ({ navigation }) => {
     const [processing, setProcessing] = useState(false)
     const [dateIO, setDataIO] = useState()
     const [disabledReadBluetooth, setDisableReadBluetooth] = useState(false)
-
     //toast
     const [typeToast, setTypeToast] = useState()
     const [titleToast, setTitleToast] = useState()
     const [messageToast, setMessageToast] = useState()
     const [visibleToast, setVisibleToast] = useState(false)
+    //context
+    const { authState,assignDeviceBluetooth } = useContext(AuthContext)
+
 
     useEffect(() => {
-        console.log('from useEffect')
+        console.log('sue effect ', (authState.deviceBluetooth.id!=undefined), authState.deviceBluetooth.connected)
+        if(authState.deviceBluetooth.id!=undefined && authState.deviceBluetooth.connected)
+            navigation.navigate(SCREEN_APP.CONFIG_COUNTER_SCREEN)
+        console.log('from useEffect', authState)
         searchDevicesAndStatus()
         listDevicesConnect()
     }, [])
 
-    const isConnectDevice=async(id:string)=>{
+    const isConnectDevice = async (id: string) => {
         return await BluetoothSerial.isConnected(id)
     }
-    const isConnect =  (devicesTemp:any) => {
-        let devicesIsConnect=[]
-        devicesTemp.map( device=>{
+    const isConnect = (devicesTemp: Array<IDeviceType>) => {
+        let devicesIsConnect:any[] = []
+        devicesTemp.map(device => {
             isConnectDevice(device.id)
-            .then((value)=>{
-                console.log('deviceId',device.id,'isConnect',value)
-                devicesIsConnect.push({
-                    ...device,
-                    connected:value
+                .then((value) => {
+                    devicesIsConnect.push({
+                        ...device,
+                        connected: value
+                    })
                 })
-            })
-            .then(()=>{
-                console.log('asdfasdfds',devicesIsConnect)
-                setDevices(devicesIsConnect)
-            })
+                .then(() => {
+                    setDevices(devicesIsConnect)
+                })
         })
     }
 
@@ -91,17 +107,20 @@ export const BluetoothDeviceConnectScreen = ({ navigation }) => {
 
             console.log('search device', isEnabled)
 
-            const devicesTemp = devices.map(device => ({
+            const devicesTemp:Array<IDeviceType> = devices.map(device => ({
                 ...device,
                 paired: true,
                 connected: false
             }))
-            console.log(devicesTemp)
+            
             await setIsEnabled(isEnabled)
             await isConnect(devicesTemp)
             await AsyncStorage.setItem('listDevicesConnect', JSON.stringify(devicesTemp));
         } catch (e) {
-            renderToast(GLOBAL_CONSTANT.TOAST_ERROR, GLOBAL_CONSTANT.TOAST_NOT_REGISTER.TITLE, e.message)
+            renderToast(
+                BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_ERROR, 
+                BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_ERROR_BLUETOOTH.TITLE,
+                e.message)
         }
     }
 
@@ -118,7 +137,6 @@ export const BluetoothDeviceConnectScreen = ({ navigation }) => {
 
     //return EnableBluetooth
     const toggleBluetooth = async (isEnabled?: boolean) => {
-        console.log('is enabled toggle bluetooth', isEnabled)
         if (isEnabled) {
             setVisibleLoading(true)
             setTimeout(() => {
@@ -142,14 +160,10 @@ export const BluetoothDeviceConnectScreen = ({ navigation }) => {
     }
 
     const onChangeModalVisible = (visible) => {
-        console.log('BLUETOOTH SCREEN MODAL VISIBLE')
         setModalVisible(false)
     }
 
     const choiceDevice = (id) => {
-        console.log('FROM BLUETOOTH SCREEN jdklfjlkasd')
-        console.log(id)
-
         let tempDevice
         devices.map(row => {
             if (row.id == id)
@@ -165,8 +179,10 @@ export const BluetoothDeviceConnectScreen = ({ navigation }) => {
             const connected = await BluetoothSerial.device(deviceUnique.id).connect();
 
             if (connected) {
-                renderToast('success', 'connected', 'device connected')
-                console.log('connected device', connected)
+                renderToast(
+                    BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_SUCCESS, 
+                    BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_CONNECT_BLUETOOTH.TITLE,
+                    BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_CONNECT_BLUETOOTH.MESSAGE)
 
                 setVisibleLoading(false)
                 const tempDevice = devices.map(v => {
@@ -180,18 +196,28 @@ export const BluetoothDeviceConnectScreen = ({ navigation }) => {
 
                     return v;
                 })
-                console.log('list devices with element connected', tempDevice)
-                setDevices(tempDevice)
 
+                setDevices(tempDevice)
+                //use context
+                assignDeviceBluetooth(tempDevice.filter(device => device.id === connected.id)[0])
+                //save to device memory
                 await AsyncStorage.setItem('deviceBluetoothConnect', JSON.stringify(tempDevice.filter(device => device.id === connected.id)[0]));
                 await AsyncStorage.setItem('listDevicesConnect', JSON.stringify(tempDevice));
+                //go to screen configCounterScreen
+                navigation.navigate(SCREEN_APP.CONFIG_COUNTER_SCREEN)
 
             } else {
-                renderToast('error', 'error', 'failed connected device')
+                renderToast(
+                    BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_ERROR, 
+                    BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_ERROR_BLUETOOTH.TITLE,
+                    BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_ERROR_BLUETOOTH.MESSAGE)
                 setVisibleLoading(false)
             }
         } catch (e) {
-            renderToast('error', 'error', e.message)
+            renderToast(
+                BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_ERROR, 
+                BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_ERROR_BLUETOOTH.TITLE,
+                e.message)
             setVisibleLoading(false)
         }
     };
@@ -201,8 +227,10 @@ export const BluetoothDeviceConnectScreen = ({ navigation }) => {
         try {
             await BluetoothSerial.device(deviceUnique.id).disconnect();
 
-
-            renderToast('success', 'connected', 'device disconnected')
+            renderToast(
+                BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_SUCCESS, 
+                BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_ERROR_BLUETOOTH.TITLE,
+                BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_ERROR_BLUETOOTH.MESSAGE)
 
             setVisibleLoading(false)
             const tempDevice = devices.map(v => {
@@ -214,11 +242,16 @@ export const BluetoothDeviceConnectScreen = ({ navigation }) => {
                 }
                 return v;
             })
-            console.log('list devices with element disconnected', tempDevice)
+
+            //use context
+            assignDeviceBluetooth(tempDevice.filter(device => device.id === deviceUnique.id)[0])
             setDevices(tempDevice)
             //setDisableReadBluetooth(true)
         } catch (e) {
-            renderToast('error', 'error', e.message)
+            renderToast(
+                BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_ERROR, 
+                BLUETOOTH_DEVICE_CONNECT_SCREEN.TOAST_ERROR_BLUETOOTH.TITLE,
+                e.message)
             setVisibleLoading(false)
         }
     };

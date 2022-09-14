@@ -5,8 +5,10 @@ type AuthAction =
     | { type: 'logout' }
     | { type: 'changeFavIcon', payload: string }
     | { type: 'changeUsername', payload: string }
-    | { type: 'assignEmail', payload: string }
-    | { type: 'assignToken', payload: string };
+    | { type: 'assignUser', payload:any}
+    | { type: 'assignDeviceBluetooth', payload:any}
+    | { type: 'assignTokenGeneric', payload: string }
+    | { type: 'assignTokenUser', payload: string };
 
 //state generate
 export const authReducer = (state: AuthState, action: AuthAction): AuthState => {
@@ -36,15 +38,27 @@ export const authReducer = (state: AuthState, action: AuthAction): AuthState => 
                 username: undefined,
                 favoriteIcon: undefined
             }
-        case 'assignEmail':
-            return {
+        case 'assignUser':{
+            return{
                 ...state,
-                email: action.payload
+                user:action.payload
             }
-        case 'assignToken':
+        }
+        case 'assignDeviceBluetooth':{
+            return{
+                ...state,
+                deviceBluetooth:action.payload
+            }
+        }
+        case 'assignTokenGeneric':
             return {
                 ...state,
-                token: action.payload
+                tokenGeneric: action.payload
+            }
+        case 'assignTokenUser':
+            return {
+                ...state,
+                tokenUser: action.payload
             }
         default:
             return state;

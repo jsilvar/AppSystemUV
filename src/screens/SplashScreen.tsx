@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import {  ScreenStackProps } from 'react-native-screens';
 
-import { SPLASH_SCREEN } from '../constants/GlobalConstant';
+import { SPLASH_SCREEN, SCREEN_APP } from '../constants/GlobalConstant';
 
 
 interface Props extends StackScreenProps<any,any>{
@@ -20,7 +20,7 @@ export const SplashScreen = ({navigation}:Props) => {
 
     useEffect(() => {
         setTimeout(() => {
-            navigation.navigate('LoginScreen')
+            navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
         }, 3000);
     }, [])
 

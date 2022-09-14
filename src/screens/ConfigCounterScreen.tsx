@@ -32,11 +32,14 @@ export const ConfigCounterScreen = ({ navigation }: Props) => {
 
   const {
     visible,
+    visibleLoader,
     titleToast,
     messageToast,
     typeToast,
     validated,
     luminariesList,
+    luminariesAPIList,
+    classRoomsAPIList,
     isValidatedFieldClassRoom,
     isValidatedFieldLuminaries,
     isValidatedFieldTimer,
@@ -48,7 +51,7 @@ export const ConfigCounterScreen = ({ navigation }: Props) => {
     <View style={styles.container}>
       <View style={styles.space}>
         <LoaderGeneric
-          visible={visible}
+          visible={visibleLoader}
         />
         <ToastGeneric
           title={titleToast}
@@ -59,7 +62,7 @@ export const ConfigCounterScreen = ({ navigation }: Props) => {
       </View>
       <View style={styles.form}>
         <View style={styles.mainTitle}>
-          <Text style={styles.title}>CONFIGURAR CRONÓMETRO</Text>
+          <Text style={styles.title}>{CONFIG_COUNTER_SCREEN.TITLE}</Text>
         </View>
         <View style={styles.classRooms}>
           <PickerGeneric
@@ -67,7 +70,7 @@ export const ConfigCounterScreen = ({ navigation }: Props) => {
             placeHolder={SELECT_OPTION.DEFAULT}
             validated={validated}
             textLabel='Aula'
-            data={CLASS_ROOMS}
+            data={classRoomsAPIList}
             defaultValue={SELECT_OPTION.DEFAULT}
             labelRule='Aula'
             rules={[KEY_RULE_CONSTANT.REQUIRED]}
@@ -80,7 +83,7 @@ export const ConfigCounterScreen = ({ navigation }: Props) => {
             placeHolder={SELECT_OPTION.DEFAULT}
             validated={validated}
             textLabel='Luminarias'
-            data={LUMINARY}
+            data={luminariesAPIList}
             defaultValue={SELECT_OPTION.DEFAULT}
             labelRule='Luminarias'
             rules={[KEY_RULE_CONSTANT.REQUIRED]}

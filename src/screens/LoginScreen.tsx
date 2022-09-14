@@ -1,5 +1,5 @@
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useEffect, useRef, useReducer } from 'react';
+import React, { useState, useEffect, useRef, useReducer, useContext } from 'react';
 import {
     View,
     Text,
@@ -14,7 +14,7 @@ import { KEY_RULE_CONSTANT } from '../constants/validator/KeyRuleConstant';
 //config keyboard
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 //constants
-import { LOGIN_SCREEN, SPLASH_SCREEN } from '../constants/GlobalConstant';
+import { LOGIN_SCREEN, SPLASH_SCREEN, SCREEN_APP } from '../constants/GlobalConstant';
 import { USERS, CODE_HTTP, VERB_HTTP, ROLE_API, ERROR_TOKEN } from '../constants/ApiResource'
 //API
 import { PetitionAPI } from '../util/PetitionAPI'
@@ -23,6 +23,7 @@ import { loginInitialState, LoginReducer } from '../reducer/LoginReducer';
 import { LoaderGeneric } from '../components/generic/LoaderGeneric';
 import { TextInputGeneric } from '../components/generic/TextInputGeneric';
 import { ToastGeneric } from '../components/generic/ToastGeneric';
+import { AuthContext } from '../context/AuthContext';
 
 interface Props extends StackScreenProps<any, any> { };
 
@@ -42,6 +43,8 @@ export const LoginScreen = ({ navigation }: Props) => {
     //call api
     const { tokenJWTUser, requestPetition } = PetitionAPI()
     const [validateCallAPI, setValidateCallAPI] = useState(0)
+    //context
+    const {assignTokenGeneric, assignTokenUser, assignEmail, authState, assignUser}=useContext(AuthContext)
 
     useEffect(() => {
         if (loginState.email.validated && loginState.password.validated
@@ -80,11 +83,11 @@ export const LoginScreen = ({ navigation }: Props) => {
 
     //Go to screen RegisterScreen or ForgotPasswordScreen
     const enableRegisterScreen = () => {
-        navigation.navigate('RegisterScreen')
+        navigation.navigate(SCREEN_APP.REGISTER_SCREEN)
     }
 
     const enableFortgotPasswordScreen = () => {
-        navigation.navigate('RegisterScreen')
+        navigation.navigate(SCREEN_APP.CHANGE_PASSWORD_SCREEN)
     }
 
     //click button login
@@ -121,13 +124,44 @@ export const LoginScreen = ({ navigation }: Props) => {
 
             console.log('tokenUser: ', code, data)
             if (code == CODE_HTTP.OK) {
+                //context
+                assignTokenUser(access_token)
+                
+
                 let { code, data } = await requestPetition('get', USERS.GET_USER_BY_EMAIL.replace('${email}', loginState.email.value), access_token)
                 setVisibleLoader(false)
                 console.log("data by email: ", data)
-                if (code == CODE_HTTP.OK && data.role == ROLE_API.ADMIN)
-                    console.log("call next screen according role admin")
-                else if (code == CODE_HTTP.OK && data.role == ROLE_API.USER)
-                    console.log("call next screen according role user")
+                if (code == CODE_HTTP.OK && data.role == ROLE_API.ADMIN){
+                    //context
+                    let user={
+                        email:data.email,
+                        identificationNumber:data.identification_number,
+                        firstName:data.first_name,
+                        lastName:data.last_name,
+                        enabled:data.enabled,
+                        role:data.role,
+                    }
+                    assignUser(user)
+                    //add logic according to role admin
+                    navigation.navigate(SCREEN_APP.BLUETOOTH_DEVICE_CONNECT_SCREEN)
+                    //navigation.navigate('ConfigCounterScreen')
+                }
+                else if (code == CODE_HTTP.OK && data.role == ROLE_API.USER){
+                    //context
+                    let user={
+                        email:data.email,
+                        identificationNumber:data.identification_number,
+                        firstName:data.first_name,
+                        lastName:data.last_name,
+                        enabled:data.enabled,
+                        role:data.role,
+                    }
+                    console.log('user data: ',user)
+                    assignUser(user)
+                    //add logic according to role user
+                    navigation.navigate(SCREEN_APP.BLUETOOTH_DEVICE_CONNECT_SCREEN)
+                    //navigation.navigate('ConfigCounterScreen')
+                }
                 else {
                     useToast(LOGIN_SCREEN.TOAST_ERROR, LOGIN_SCREEN.TOAST_ROLE_NON_EXISTENT.TITLE, LOGIN_SCREEN.TOAST_ROLE_NON_EXISTENT.MESSAGE)
                 }

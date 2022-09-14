@@ -19,7 +19,6 @@ export const PetitionAPI = () => {
     return response
   })
   */
-  
 
   const tokenJWT = async () => {
     let basicAuth = 'Basic ' + Base64.encode(AUTH_BASIC.USER_NAME + ':' + AUTH_BASIC.PASSWORD);

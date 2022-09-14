@@ -58,3 +58,12 @@ export const LOGIN = {
     GENERATE_PIN: '/login/generate-pin/${email}',
     CONFIRM_PIN: '/login/confirm-pin/${pin}/${email}',
 }
+
+export const CONFIG_COUNTER = {
+    LUMINARIES_LIST: '/luminaries/list',
+    CLASS_ROOMS_LIST: '/class-rooms/list',
+}
+
+export const COUNTER_DOWN_API={
+    REGISTER_DISINFECTION:'/disinfections'
+}

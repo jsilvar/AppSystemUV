@@ -14,7 +14,7 @@ import { KEY_RULE_CONSTANT } from '../constants/validator/KeyRuleConstant';
 //config keyboard
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 //constants
-import { CHANGE_PASSWORD_SCREEN, LOGIN_SCREEN, SELECT_OPTION } from '../constants/GlobalConstant';
+import { CHANGE_PASSWORD_SCREEN, LOGIN_SCREEN, SELECT_OPTION, SCREEN_APP } from '../constants/GlobalConstant';
 import { LOGIN, CODE_HTTP, VERB_HTTP, ROLE_API, ERROR_TOKEN } from '../constants/ApiResource'
 //API
 import { PetitionAPI } from '../util/PetitionAPI'
@@ -196,7 +196,7 @@ export const ChangePasswordScreen = ({ navigation }: Props) => {
       if (code == CODE_HTTP.ACCEPTED) {
         useToast(CHANGE_PASSWORD_SCREEN.TOAST_SUCCESS, CHANGE_PASSWORD_SCREEN.TOAST_CHANGE_PASSWORD.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_CHANGE_PASSWORD.MESSAGE)
         setTimeout(() => {
-          navigation.navigate('LoginScreen')
+          navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
         }, 500);
       }
       else

@@ -1,39 +1,46 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Text, View, StyleSheet, Button, useWindowDimensions, AppState } from 'react-native'
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
 import Spinner from 'react-native-spinkit';
-//constant
-import { COUNTER_DOWN } from '../../constants/GlobalConstant'
 //navigation
 import { useRoute } from '@react-navigation/native';
 
 import { ToastGeneric } from '../../components/generic/ToastGeneric';
 import PushNotification from 'react-native-push-notification';
 
+//constants
+import { COUNTER_DOWN_API } from '../../constants/ApiResource';
+import { CHANGE_PASSWORD_SCREEN, COUNTER_DOWN_SCREEN, LOGIN_SCREEN } from '../../constants/GlobalConstant';
+import { CODE_HTTP, CONFIG_COUNTER, ERROR_TOKEN, LOGIN, VERB_HTTP } from '../../constants/ApiResource';
+import { COUNTER_DOWN, SCREEN_APP } from '../../constants/GlobalConstant';
 import BackgroundService from 'react-native-background-actions';
 
 import BluetoothSerial, {
     withSubscription
 } from "react-native-bluetooth-serial-next";
+import { AuthContext } from '../../context/AuthContext';
+import { LoaderGeneric } from '../generic/LoaderGeneric';
 
-interface Params {
-    timerCountDown: any,
-    deviceBluetoothConnect: any,
-    luminaries: any,
-}
+import { PetitionAPI } from '../../util/PetitionAPI';
+import { StackScreenProps } from '@react-navigation/stack';
 
-export const CounterDown = () => {
+interface Props extends StackScreenProps<any, any> { };
+
+export const CounterDown = ({ navigation }: Props) => {
 
     const [timeDuration, setTimeDuration] = useState(0)
     const [isPlaying, setIsPlaying] = useState(false)
     const [key, setKey] = useState(0);
     const { height, width } = useWindowDimensions()
     const { params } = useRoute();
+    const [finishedTime, setFinishedTime] = useState(false)
     //bluetooth
     const [deviceConnect, setDeviceConnect] = useState()
     const [messageBluetooth, setMessageBluetooth] = useState()
     const [resetLamps, setResetLamps] = useState(COUNTER_DOWN.RESET_LAMPS)
-    const [dateIO, setDataIO] = useState(COUNTER_DOWN.WITHOUT_DATA_SENSOR)
+    const [dataIO, setDataIO] = useState(COUNTER_DOWN.WITHOUT_DATA_SENSOR)
+    const [dataTemp, setDataTemp] = useState([])
+    const [sensorUV, setSensorUV] = useState(0)
     const [disabledReadBluetooth, setDisabledReadBluetooth] = useState(false)
     const [idIntervalReadBluetooth, setIdIntervalReadBluetooth] = useState()
     //enabled render time
@@ -43,14 +50,21 @@ export const CounterDown = () => {
     const [titleToast, setTitleToast] = useState()
     const [messageToast, setMessageToast] = useState()
     const [visibleToast, setVisibleToast] = useState(false)
+    const [visibleLoader, setVisibleLoader] = useState(false)
+    const [enabledCounterDown, setEnabledCounterDown] = useState(false)
     //appState
     const appState = useRef(AppState.currentState)
     const [appStateVisible, setAppStateVisible] = useState(appState.current)
+    //context
+    const { authState } = useContext(AuthContext)
+    //call api
+    const { tokenJWT, tokenJWTUser, requestPetition } = PetitionAPI()
+
 
     const options = {
-        taskName: 'Example',
-        taskTitle: 'ExampleTask title',
-        taskDesc: 'ExampleTask description',
+        taskName: 'Hilo',
+        taskTitle: 'Hilo ejecutándose',
+        taskDesc: 'Descripción hilo ejecutándose',
         taskIcon: {
             name: 'ic_launcher',
             type: 'mipmap',
@@ -64,14 +78,114 @@ export const CounterDown = () => {
 
 
     useEffect(() => {
-
+        console.log('params', params)
+        console.log('navigation', navigation)
+        console.log('authstate: ', authState)
         getStatusApp()
+        setEnabledCounter()
 
         setDeviceConnect(params.deviceBluetoothConnect)
-        setMessageBluetooth(params.luminaries.value)
+        setMessageBluetooth(params.luminary.value)
         convertTime(params)
 
     }, [isPlaying, timeDuration])
+
+    const setEnabledCounter = () => {
+        setTimeout(() => {
+            setEnabledCounterDown(true)
+        }, 500);
+
+    }
+    //use toast
+    const useToast = (type: string, title: string, message: string) => {
+        setTypeToast(type)
+        setTitleToast(title)
+        setMessageToast(message)
+        setVisibleToast(true)
+        setTimeout(() => {
+            setVisibleToast(false)
+        }, 3000);
+    }
+
+    //call register api
+    const callDisinfectionAPI = async () => {
+        setVisibleLoader(true)
+
+        //get average sensor UV
+        //loop array
+        const initialValue = 0
+        const sumWithInitial = dataTemp.reduce(
+            (previousValue, currentValue) => previousValue + currentValue,
+            initialValue
+        );
+        console.log('average sense: ', (sumWithInitial / dataTemp.length).toFixed(2), dataTemp.length)
+        console.log('average sense: ' + sumWithInitial)
+
+        //assembler object
+        let disinfection = {
+            user: {
+                ...authState.user,
+                identification_number: authState.user.identificationNumber,
+            },
+            luminary: {
+                id_luminary: params.luminary.idLuminary,
+                name: params.luminary.value
+            },
+            class_room: {
+                id_class_room: params.classRoom.idClassRoom,
+                name: params.classRoom.value
+            },
+            sensor_uv: (sumWithInitial / dataTemp.length).toFixed(2)
+        }
+
+        //call api
+        let { code, data } = await requestPetition(VERB_HTTP.POST, COUNTER_DOWN_API.REGISTER_DISINFECTION, authState.tokenUser, disinfection)
+        setVisibleLoader(false)
+
+        console.log(code, data)
+        if (code == CODE_HTTP.CREATED) {
+            useToast(CHANGE_PASSWORD_SCREEN.TOAST_SUCCESS, CHANGE_PASSWORD_SCREEN.TOAST_REGISTER_DATA.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_REGISTER_DATA.MESSAGE)
+        }
+        else {
+            errorResponseCallApi(code, data)
+        }
+    }
+
+    const errorResponseCallApi = (code: string, data: any) => {
+        if (code == CODE_HTTP.ERROR_SERVER)
+            useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ERROR_SERVER.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ERROR_SERVER.MESSAGE)
+        else if (code == CODE_HTTP.CONFLICT)
+            useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_NOT_REGISTER.TITLE, data.message)
+        else if (code == CODE_HTTP.NOT_FOUND)
+            useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_NOT_FOUND.TITLE, data.message)
+        else if (code == CODE_HTTP.NOT_AUTHORIZED) {
+            useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+            setTimeout(() => {
+                console.log('navigation', navigation)
+                navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
+            }, 3500);
+        }
+        else {
+            useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ROLE_NON_EXISTENT.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ROLE_NON_EXISTENT.MESSAGE)
+        }
+    }
+
+    const errorCallApi = (code: string, data: any) => {
+        setVisibleLoader(false)
+        if (code == CODE_HTTP.BAD_REQUEST && data.error_description.search(ERROR_TOKEN.BAD_CREDENTIALS) >= 0)
+            useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_BAD_CREDENTIALS.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_BAD_CREDENTIALS.MESSAGE)
+        else if (code == CODE_HTTP.NOT_AUTHORIZED)
+            useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+        else if (code == CODE_HTTP.FORBIDDEN)
+            useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_IS_DENIED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_IS_DENIED.MESSAGE)
+        else if (code == CODE_HTTP.NOT_AUTHORIZED) {
+            useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+            navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
+        }
+        else
+            useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ERROR_NOT_FOUND.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ERROR_NOT_FOUND.MESSAGE)
+    }
+
 
     const startTask = async () => {
         console.log('start task')
@@ -101,7 +215,7 @@ export const CounterDown = () => {
         });
     };
 
-    const getStatusApp=()=>{
+    const getStatusApp = () => {
         const subscription = AppState.addEventListener("change", nextAppState => {
             if (
                 appState.current.match(/inactive|background/) &&
@@ -138,14 +252,14 @@ export const CounterDown = () => {
         appState.current = nextAppState
         setAppStateVisible(appState.current)
 
-        if(appState.current.match(/background/)){
+        if (appState.current.match(/background/)) {
             console.log('enter background')
-            setInterval(()=>{
+            setInterval(() => {
                 console.log('hfuasdfasdf')
-            },2000)
+            }, 1000)
         }
 
-        console.log('AppState: ',appState.current)
+        console.log('AppState: ', appState.current)
     }
 
     const handleNotification = () => {
@@ -159,13 +273,15 @@ export const CounterDown = () => {
         })
     }
 
-    const formatDataSensor = (data: string) => {
+    const formatDataSensor = async (data: string) => {
         if (data === '')
             setDataIO(COUNTER_DOWN.WITHOUT_DATA_SENSOR)
         else {
-            const dataTemp = data.substring(data.search('=') + 1, data.search(','))
-            let sensorUV = parseFloat(dataTemp) * COUNTER_DOWN.CONSTANT_UV
-            setDataIO(COUNTER_DOWN.DATA_SENSOR.replace('{0}', sensorUV.toFixed(2).toString()))
+            const dataSensor = data.substring(data.search('=') + 1, data.search(','))
+            let sensorUV: number = parseFloat(dataSensor) * COUNTER_DOWN.CONSTANT_UV
+            console.log(dataTemp, sensorUV.toFixed(2).toString())
+            await setDataTemp(dataTemp => [...dataTemp, parseFloat(sensorUV.toFixed(2))])
+            await setDataIO(COUNTER_DOWN.DATA_SENSOR.replace('{0}', sensorUV.toFixed(2).toString()))
         }
     }
 
@@ -177,7 +293,7 @@ export const CounterDown = () => {
                     setIdIntervalReadBluetooth(intervalId)
                     formatDataSensor(data)
                 },
-                1000,
+                2000,
                 "\r\n"
             );
         } catch (e) {
@@ -243,12 +359,20 @@ export const CounterDown = () => {
     }
 
     const renderTime = ({ remainingTime }) => {
-        //console.log('remaining time currently', remainingTime)
-        if (remainingTime === 0) {
+        if (remainingTime === 0 && !finishedTime) {
+            //call api save data
+            callDisinfectionAPI()
+
             console.log('remaining time zero', remainingTime)
             restartMessageBluetooth()
             if (enabledPushNotification)
                 handleNotification()
+            clearInterval(idIntervalReadBluetooth);
+            //clear variables
+            setDataTemp([])
+            setDataIO(COUNTER_DOWN.WITHOUT_DATA_SENSOR)
+            setFinishedTime(true)
+        } else if (remainingTime === 0) {
             return (
                 <View style={[style.timer, { width: width * 0.4, height: width * 0.5 }]}>
                     <Spinner
@@ -281,48 +405,43 @@ export const CounterDown = () => {
     return (
         <View style={style.container}>
             <View style={{ height: 1 }}>
+                <LoaderGeneric
+                    visible={visibleLoader}
+                />
                 <ToastGeneric
                     title={titleToast}
                     message={messageToast}
                     type={typeToast}
                     visible={visibleToast}
                 />
-                {/* <LoaderGeneric
-                    visible={visibleLoading}
-                />
-                <ModalGeneric
-                    modalVisible={modalVisible}
-                    deviceUnique={deviceUnique}
-                    onChange={(visible) => onChangeModalVisible(visible)}
-                    connect={connect}
-                    disconnect={disconnect}
-                /> */}
             </View>
             <Text style={style.mainTitle}>{COUNTER_DOWN.TITLE}</Text>
             <View style={style.sensor}>
-                <Text style={style.sensorText}>{dateIO}</Text>
+                <Text style={style.sensorText}>{dataIO}</Text>
             </View>
             <View style={style.timerWrapper}>
-                <CountdownCircleTimer
-                    key={key}
-                    size={width * 0.9}
-                    strokeWidth={width * 0.08}
-                    trailStrokeWidth={width * 0.1}
-                    trailColor='#d9d9d9'
-                    strokeLinecap='round'
-                    isSmoothColorTransition={true}
-                    isPlaying={isPlaying}
-                    duration={timeDuration}
-                    colors={['#ba55d3', '#bb3385', '#78184a', '#DC143C']}
-                    colorsTime={[0.75 * timeDuration, 0.5 * timeDuration, 0.25 * timeDuration, 0]}
-                    initialRemainingTime={timeDuration}
-                    onComplete={() => {
-                        // do your stuff here
-                        return { shouldRepeat: false, delay: 2 } // repeat animation in 1.5 seconds
-                    }}
-                >
-                    {renderTime}
-                </CountdownCircleTimer>
+                {enabledCounterDown && (
+                    <CountdownCircleTimer
+                        key={key}
+                        size={width * 0.9}
+                        strokeWidth={width * 0.08}
+                        trailStrokeWidth={width * 0.1}
+                        trailColor='#d9d9d9'
+                        strokeLinecap='round'
+                        isSmoothColorTransition={true}
+                        isPlaying={isPlaying}
+                        duration={timeDuration}
+                        colors={['#ba55d3', '#bb3385', '#78184a', '#DC143C']}
+                        colorsTime={[0.75 * timeDuration, 0.5 * timeDuration, 0.25 * timeDuration, 0]}
+                        initialRemainingTime={timeDuration}
+                        onComplete={() => {
+                            // do your stuff here
+                            return { shouldRepeat: false, delay: 2 } // repeat animation in 1.5 seconds
+                        }}
+                    >
+                        {renderTime}
+                    </CountdownCircleTimer>
+                )}
             </View>
             <Button
                 style={style.buttonWrapper}
@@ -331,6 +450,7 @@ export const CounterDown = () => {
                 onPress={() => {
                     setIsPlaying(false)
                     setKey(prevKey => prevKey + 1)
+                    setFinishedTime(false)
                     restartMessageBluetooth()
                 }} />
         </View>

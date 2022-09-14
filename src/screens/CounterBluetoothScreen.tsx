@@ -5,12 +5,15 @@ import {
 import { CounterDown } from '../components/bluetooth/CounterDown';
 import {COUNTER_DOWN} from '../constants/GlobalConstant'
 import PushNotification  from 'react-native-push-notification';
+import { StackScreenProps } from '@react-navigation/stack';
 
-export const CounterBluetoothScreen = () => {
+interface Props extends StackScreenProps<any, any> {}
 
+export const CounterBluetoothScreen = ({navigation}:Props) => {
 
   useEffect(() => {
     createChannels()
+    console.log('navigation', navigation)
   }, [])
 
   const createChannels = () => {
@@ -29,6 +32,7 @@ export const CounterBluetoothScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <CounterDown
+        navigation={navigation}
       />
     </View>
   )

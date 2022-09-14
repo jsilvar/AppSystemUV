@@ -11,6 +11,17 @@ export const GLOBAL_CONSTANT = {
     }
 }
 
+export const SCREEN_APP={
+    BLUETOOTH_DEVICE_CONNECT_SCREEN:'BluetoothDeviceConnectScreen',
+    LOGIN_SCREEN:'LoginScreen',
+    REGISTER_SCREEN:'RegisterScreen',
+    CHANGE_PASSWORD_SCREEN:'ChangePasswordScreen',
+    CONFIG_COUNTER_SCREEN:'ConfigCounterScreen',
+    COUNTER_BLUETOOTH_SCREEN:'CounterScreen',
+    USER_INFO_GENERAL_SCREEN:'UserInfoGeneralScreen',
+    VALIDATE_SCREEN:'ValidatePinScreen'
+}
+
 export const SPLASH_SCREEN= {
     PATH_SPLASH:require('../images/splash.png')
 };
@@ -80,10 +91,6 @@ export const REGISTER_SCREEN = {
         TITLE:'¡Registro fallido!',
         MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
     },
-    TOAST_ACCESS_TOKEN_EXPIRED:{
-        TITLE:'¡Registro fallido!',
-        MESSAGE:'Su sesión ha finalizado.'
-    },
     TOAST_BAD_CREDENTIALS:{
         TITLE:'¡Ingreso fallido!',
         MESSAGE:'Credenciales inválidas. Ingrese nuavemente su email y contraseña registrados.'
@@ -99,10 +106,14 @@ export const REGISTER_SCREEN = {
     TOAST_ERROR_SERVER:{
         TITLE:'¡Error interno!',
         MESSAGE:'Error interno en el backend. Contacte su administrador.'
-    }
+    },
+    TOAST_ACCESS_TOKEN_EXPIRED:{
+        TITLE:'¡Expiró la sesión!',
+        MESSAGE:'Ingrese nuevamente desde el inicio de sesión.'
+    },
 }
 
-export const CHANGE_PASSWORD_SCREEN = {
+export const BLUETOOTH_DEVICE_CONNECT_SCREEN = {
     ID_NUMBER: 'NÚMERO DE IDENTIFICACIÓN:',
     TITLE:'¿Olvido su contraseña? Ingrese el correo registrado en la plataforma',
     SUBTITLE:'Se confirmó el pin para el correo: ${email}. Digite su contraseña.',
@@ -125,13 +136,25 @@ export const CHANGE_PASSWORD_SCREEN = {
     CHANGE_PASSWORD_BUTTON_NAME:'CAMBIAR CONTRASEÑA',
     REGISTER:'Regístrese aquí',
     MODAL:{
-        TITLE:'DIGITE PIN ENVIADO A SU CORREO',
+        TITLE:'ESCOJA UNA OPCIÓN',
         CLOSE_BUTTON:'CERRAR',
-        VALIDATION_BUTTON:'VALIDAR',
-        GET_PIN_BUTTON:'NUEVO PIN'
+        CONNECT_BUTTON:'CONECTAR',
+        DISCONNECT_BUTTON:'DESCONECTAR'
     },
     TOAST_SUCCESS:'success',
     TOAST_ERROR:'error',
+    TOAST_CONNECT_BLUETOOTH:{
+        TITLE:'¡Conexión exitosa!',
+        MESSAGE:'Disposivo bluetooth conectado'
+    },
+    TOAST_DISCONNECT_BLUETOOTH:{
+        TITLE:'¡Conexión terminada!',
+        MESSAGE:'La conexión con el dispositivo bluetooth finalizó.'
+    },
+    TOAST_ERROR_BLUETOOTH:{
+        TITLE:'¡Falla Bluetooth!',
+        MESSAGE:'Error con el dispositivo bluetooth.'
+    },
     TOAST_SEND_PIN:{
         TITLE:'¡Pin enviado!',
         MESSAGE:'El pin se envió al correo registrado.'
@@ -178,6 +201,86 @@ export const CHANGE_PASSWORD_SCREEN = {
     }
 }
 
+export const CHANGE_PASSWORD_SCREEN = {
+    ID_NUMBER: 'NÚMERO DE IDENTIFICACIÓN:',
+    TITLE:'¿Olvido su contraseña? Ingrese el correo registrado en la plataforma',
+    SUBTITLE:'Se confirmó el pin para el correo: ${email}. Digite su contraseña.',
+    CELL_COUNT:6,
+    EMAIL: 'CORREO ELECTRÓNICO:',
+    FIRST_NAME: 'NOMBRE(S):',
+    LAST_NAME: 'APELLIDO(S):',
+    PASSWORD: 'CONTRASEÑA:',
+    CONFIRM_PASSWORD: 'CONFIRMAR CONTRASEÑA:',
+    ROLE: 'ROL:',
+    ID_NUMBER_WATERMARK: 'Digite su número de identificación',
+    EMAIL_WATERMARK: 'Digite su correo electrónico',
+    FIRST_NAME_WATERMARK: 'Digite su(s) nombre(s)',
+    LAST_NAME_WATERMARK: 'Digite su(s) apellido(s)',
+    PASSWORD_WATERMARK: 'Digite su contraseña',
+    CONFIRM_PASSWORD_WATERMARK: 'Digite confirmación de contraseña',
+    ROLE_WATERMARK: 'Rol:',
+    PATH_LOGO: require('../images/water.jpg'),
+    BUTTON_NAME: 'SOLICITAR PIN',
+    CHANGE_PASSWORD_BUTTON_NAME:'CAMBIAR CONTRASEÑA',
+    REGISTER:'Regístrese aquí',
+    MODAL:{
+        TITLE:'DIGITE PIN ENVIADO A SU CORREO',
+        CLOSE_BUTTON:'CERRAR',
+        VALIDATION_BUTTON:'VALIDAR',
+        GET_PIN_BUTTON:'NUEVO PIN'
+    },
+    TOAST_SUCCESS:'success',
+    TOAST_ERROR:'error',
+    TOAST_SEND_PIN:{
+        TITLE:'¡Pin enviado!',
+        MESSAGE:'El pin se envió al correo registrado.'
+    },
+    TOAST_REGISTER_DATA:{
+        TITLE:'¡Registro exitoso!',
+        MESSAGE:'El registro de la desinfección fue registrada con éxito.'
+    },
+    TOAST_CONFIRM_PIN:{
+        TITLE:'¡Pin confirmado!',
+        MESSAGE:'El pin se confirmo exitosamente.'
+    },
+    TOAST_CHANGE_PASSWORD:{
+        TITLE:'¡Contraseña modificada!',
+        MESSAGE:'Su contraseña se modificó satisfactoriamente.'
+    },
+    TOAST_NOT_REGISTER:{
+        TITLE:'¡Registro fallido!',
+        MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
+    },
+    TOAST_ACCESS_TOKEN_EXPIRED:{
+        TITLE:'¡Expiró la sesión!',
+        MESSAGE:'Ingrese nuevamente desde el inicio de sesión.'
+    },
+    TOAST_BAD_CREDENTIALS:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Credenciales inválidas. Ingrese nuavemente su email y contraseña registrados.'
+    },
+    TOAST_ACCESS_IS_DENIED:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'No está autorizado para este recurso del backend.'
+    },
+    TOAST_ROLE_NON_EXISTENT:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Rol no registrado previamente. Contacte su administrador.'
+    },
+    TOAST_ERROR_SERVER:{
+        TITLE:'¡Error interno!',
+        MESSAGE:'Error interno en el backend. Contacte su administrador.'
+    },
+    TOAST_ERROR_NOT_FOUND:{
+        TITLE:'¡Error interno!',
+        MESSAGE:'Error del API no parametrizado. Contacte su administrador.'
+    },
+    TOAST_NOT_FOUND:{
+        TITLE:'¡Pin no encontrado!',
+        MESSAGE:'Constate el pin enviado al correo registrado.'
+    },
+}
+
 export const VALIDATE_SCREEN = {
     TITLE:'Ingrese el pin enviado al correo registrado. Constate también su spam.',
     CELL_COUNT:6,
@@ -194,8 +297,8 @@ export const VALIDATE_SCREEN = {
         MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
     },
     TOAST_ACCESS_TOKEN_EXPIRED:{
-        TITLE:'¡Solicitud fallida!',
-        MESSAGE:'Su sesión ha finalizado.'
+        TITLE:'¡Expiró la sesión!',
+        MESSAGE:'Ingrese nuevamente desde el inicio de sesión.'
     },
     TOAST_BAD_CREDENTIALS:{
         TITLE:'¡Ingreso fallido!',
@@ -237,7 +340,7 @@ export const COUNTER_DOWN={
     REMAINING_TIME:'Tiempo restante',
     WITHOUT_DATA_SENSOR:'Pendiente datos sensor',
     DATA_SENSOR:'SENSOR: {0} mW/cm2',
-    CONSTANT_UV:1,
+    CONSTANT_UV:0.5,
     RESET_LAMPS:'RESET_LAMPS',
     START_BUTTON:'INICIAR',
     PAUSE_BUTTON:'PAUSAR',
@@ -320,6 +423,38 @@ export const LUMINARY=[
 ]
 
 export const CONFIG_COUNTER_SCREEN={
+    TITLE:'CONFIGURAR CRONÓMETRO',
+    ID_NUMBER: 'NÚMERO DE IDENTIFICACIÓN:',
+    EMAIL: 'CORREO ELECTRÓNICO:',
+    FIRST_NAME: 'NOMBRE(S):',
+    LAST_NAME: 'APELLIDO(S):',
+    PASSWORD: 'CONTRASEÑA:',
+    CONFIRM_PASSWORD: 'CONFIRMAR CONTRASEÑA:',
+    ROLE: 'TIMER:',
+    ID_NUMBER_WATERMARK: 'Digite su número de identificación',
+    EMAIL_WATERMARK: 'Digite su correo electrónico',
+    FIRST_NAME_WATERMARK: 'Digite su(s) nombre(s)',
+    LAST_NAME_WATERMARK: 'Digite su(s) apellido(s)',
+    PASSWORD_WATERMARK: 'Digite su contraseña',
+    CONFIRM_PASSWORD_WATERMARK: 'Digite confirmación de contraseña',
+    ROLE_WATERMARK: 'Rol:',
+    PATH_LOGO: require('../images/water.jpg'),
+    BUTTON_NAME: 'Aceptar',
+    REGISTER:'Regístrese aquí',
+    TOAST_SUCCESS:'success',
+    TOAST_ERROR:'error',
+    TOAST_REGISTER:{
+        TITLE:'¡Registro exitoso!',
+        MESSAGE:'Su registro se procesó exitosamente.'
+    },
+    TOAST_NOT_REGISTER:{
+        TITLE:'¡Registro faliido!',
+        MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
+    },
+}
+
+export const COUNTER_DOWN_SCREEN={
+    TITLE:'CONFIGURAR CRONÓMETRO',
     ID_NUMBER: 'NÚMERO DE IDENTIFICACIÓN:',
     EMAIL: 'CORREO ELECTRÓNICO:',
     FIRST_NAME: 'NOMBRE(S):',

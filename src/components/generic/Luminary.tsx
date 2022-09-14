@@ -6,13 +6,13 @@ import { RadioButton } from 'react-native-paper';
 
 interface Props {
     stateLuminaries: {
-        l1?: boolean;
-        l2?: boolean;
-        l3?: boolean;
-        l4?: boolean;
-        l5?: boolean;
-        l6?: boolean;
-        l7?: boolean;
+        lamp1?: boolean;
+        lamp2?: boolean;
+        lamp3?: boolean;
+        lamp4?: boolean;
+        lamp5?: boolean;
+        lamp6?: boolean;
+        lamp7?: boolean;
     }
 }
 
@@ -26,43 +26,43 @@ export const Luminary = ({ stateLuminaries }: Props) => {
             <View style={styles.singleLuminary}>
                 <Text>L1</Text>
                 <RadioButton
-                    status={stateLuminaries !== undefined && stateLuminaries.l1 ? 'checked' : 'unchecked'}
+                    status={stateLuminaries !== undefined && stateLuminaries.lamp1 ? 'checked' : 'unchecked'}
                 />
             </View>
             <View style={styles.singleLuminary}>
                 <Text>L2</Text>
                 <RadioButton
-                    status={stateLuminaries !== undefined && stateLuminaries.l2 ? 'checked' : 'unchecked'}
+                    status={stateLuminaries !== undefined && stateLuminaries.lamp2 ? 'checked' : 'unchecked'}
                 />
             </View>
             <View style={styles.singleLuminary}>
                 <Text>L3</Text>
                 <RadioButton
-                    status={stateLuminaries !== undefined && stateLuminaries.l3 ? 'checked' : 'unchecked'}
+                    status={stateLuminaries !== undefined && stateLuminaries.lamp3 ? 'checked' : 'unchecked'}
                 />
             </View>
             <View style={styles.singleLuminary}>
                 <Text>L4</Text>
                 <RadioButton
-                    status={stateLuminaries !== undefined && stateLuminaries.l4 ? 'checked' : 'unchecked'}
+                    status={stateLuminaries !== undefined && stateLuminaries.lamp4 ? 'checked' : 'unchecked'}
                 />
             </View>
             <View style={styles.singleLuminary}>
                 <Text>L5</Text>
                 <RadioButton
-                    status={stateLuminaries !== undefined && stateLuminaries.l5 ? 'checked' : 'unchecked'}
+                    status={stateLuminaries !== undefined && stateLuminaries.lamp5 ? 'checked' : 'unchecked'}
                 />
             </View>
             <View style={styles.singleLuminary}>
                 <Text>L6</Text>
                 <RadioButton
-                    status={stateLuminaries !== undefined && stateLuminaries.l6 ? 'checked' : 'unchecked'}
+                    status={stateLuminaries !== undefined && stateLuminaries.lamp6 ? 'checked' : 'unchecked'}
                 />
             </View>
             <View style={styles.singleLuminary}>
                 <Text>L7</Text>
                 <RadioButton
-                    status={stateLuminaries !== undefined && stateLuminaries.l7 ? 'checked' : 'unchecked'}
+                    status={stateLuminaries !== undefined && stateLuminaries.lamp7 ? 'checked' : 'unchecked'}
                 />
             </View>
         </View>

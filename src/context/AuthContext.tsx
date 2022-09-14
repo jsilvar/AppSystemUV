@@ -3,19 +3,49 @@ import { authReducer } from "../reducer/authReducer";
 
 //structure initial
 export interface AuthState {
-    isLoggedIn: Boolean;
-    username?: String;
-    email?:String;
-    token?:String;
-    favoriteIcon?: String;
+    user:{
+        identificationNumber:number|undefined;
+        email:string|undefined;
+        firstName:string|undefined;
+        lastName:string|undefined;
+        role:string|undefined;
+        enabled:boolean|undefined
+    },
+    deviceBluetooth:{
+        idDevice:string|undefined;
+        name:string|undefined;
+        connected:boolean|undefined;
+        paired:boolean|undefined;
+    },
+    isLoggedIn: boolean;
+    username?: string;
+    email?:string;
+    tokenGeneric?:string;
+    tokenUser?:string;
+    favoriteIcon?: string;
 }
 
 // initial values
 export const authInitialState: AuthState = {
+    user:{
+        identificationNumber:undefined,
+        email:undefined,
+        firstName:undefined,
+        lastName:undefined,
+        role:undefined,
+        enabled:undefined
+    },
+    deviceBluetooth:{
+        idDevice:undefined,
+        name:undefined,
+        connected:undefined,
+        paired:undefined,
+    },
     isLoggedIn: false,
     username: undefined,
     email:undefined,
-    token:undefined,
+    tokenGeneric:undefined,
+    tokenUser:undefined,
     favoriteIcon: undefined
 }
 
@@ -26,6 +56,10 @@ export interface AuthContextProps {
     logout:()=>void;
     changeFavoriteIcon:(iconName:string)=>void;
     changeUsername: (username: string) => void;
+    assignUser:({user}:AuthState)=>void;
+    assignDeviceBluetooth:({deviceBluetooth}:AuthState)=>void;
+    assignTokenGeneric:(token:string)=>void;
+    assignTokenUser:(token:string)=>void;
 }
 
 //create context
@@ -44,16 +78,24 @@ export const AuthProvider = ({ children }: any) => {
         dispatch({type:'changeFavIcon', payload:username})
     }
 
-    const assignEmail=(email:string)=>{
-        dispatch({type:'assignEmail', payload:email})
+    const assignUser=(user:AuthState)=>{
+        dispatch({type:'assignUser', payload:user})
+    }    
+
+    const assignDeviceBluetooth=(deviceBluetooth:AuthState)=>{
+        console.log('from assign device',deviceBluetooth)
+        dispatch({type:'assignDeviceBluetooth', payload:deviceBluetooth})
     }
 
-    const assignToken=(token:string)=>{
-        dispatch({type:'assignToken', payload:token})
+    const assignTokenGeneric=(token:string)=>{
+        dispatch({type:'assignTokenGeneric', payload:token})
+    }
+
+    const assignTokenUser=(token:string)=>{
+        dispatch({type:'assignTokenUser', payload:token})
     }
 
     const signIn = () => {
-        console.log('call signIn in context')
         dispatch({type:'signIn'})
     }
 
@@ -65,8 +107,10 @@ export const AuthProvider = ({ children }: any) => {
         <AuthContext.Provider value={{
             authState,
             signIn,
-            assignEmail,
-            assignToken,
+            assignUser,
+            assignDeviceBluetooth,
+            assignTokenGeneric,
+            assignTokenUser,
             logout,
             changeFavoriteIcon,
             changeUsername
