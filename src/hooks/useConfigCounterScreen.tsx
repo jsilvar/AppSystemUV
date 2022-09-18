@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from 'react'
+import React, { useState, useRef, useEffect, useContext, useLayoutEffect } from 'react'
 //navigation
 import { StackScreenProps } from '@react-navigation/stack';
 //storage
@@ -8,6 +8,8 @@ import { PetitionAPI } from '../util/PetitionAPI';
 import { CHANGE_PASSWORD_SCREEN, CONFIG_COUNTER_SCREEN, COUNTER_DOWN_SCREEN, SCREEN_APP } from '../constants/GlobalConstant';
 import { CODE_HTTP, CONFIG_COUNTER, ERROR_TOKEN, LOGIN, VERB_HTTP } from '../constants/ApiResource';
 import { AuthContext } from '../context/AuthContext';
+import { HeaderRight } from '../components/generic/HeaderRight';
+import { HeaderLeft } from '../components/generic/HeaderLeft';
 
 const usePrevious = (value) => {
   const ref = useRef();
@@ -59,8 +61,6 @@ export const useConfigCounterScreen = (navigation) => {
     callLuminariesAPI()
     callClassRoomsAPI()
   }, [])
-
-
 
   //use toast
   const useToast = (type: string, title: string, message: string) => {
@@ -126,9 +126,9 @@ export const useConfigCounterScreen = (navigation) => {
       useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_NOT_REGISTER.TITLE, data.message)
     else if (code == CODE_HTTP.NOT_FOUND)
       useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_NOT_FOUND.TITLE, data.message)
-    else if (code == CODE_HTTP.NOT_AUTHORIZED){
-        useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
-        navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
+    else if (code == CODE_HTTP.NOT_AUTHORIZED) {
+      useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+      navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
     }
     else {
       useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ROLE_NON_EXISTENT.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ROLE_NON_EXISTENT.MESSAGE)
@@ -143,9 +143,9 @@ export const useConfigCounterScreen = (navigation) => {
       useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
     else if (code == CODE_HTTP.FORBIDDEN)
       useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_IS_DENIED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_IS_DENIED.MESSAGE)
-    else if (code == CODE_HTTP.NOT_AUTHORIZED){
-        useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
-        navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
+    else if (code == CODE_HTTP.NOT_AUTHORIZED) {
+      useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+      navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
     }
     else
       useToast(CHANGE_PASSWORD_SCREEN.TOAST_ERROR, CHANGE_PASSWORD_SCREEN.TOAST_ERROR_NOT_FOUND.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ERROR_NOT_FOUND.MESSAGE)

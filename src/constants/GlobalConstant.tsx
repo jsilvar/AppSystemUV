@@ -85,7 +85,7 @@ export const REGISTER_SCREEN = {
     TOAST_ERROR:'error',
     TOAST_REGISTER:{
         TITLE:'¡Registro exitoso!',
-        MESSAGE:'Su registro se procesó exitosamente.'
+        MESSAGE:'Su registro se procesó exitosamente. Se redirigirá al login.'
     },
     TOAST_NOT_REGISTER:{
         TITLE:'¡Registro fallido!',

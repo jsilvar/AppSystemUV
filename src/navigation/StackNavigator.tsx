@@ -1,7 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Button, Text } from 'react-native'
-import { createStackNavigator } from '@react-navigation/stack'
-import { HeaderBackButton } from '@react-navigation/elements'
+import { createStackNavigator, StackScreenProps } from '@react-navigation/stack'
 import { ScreenMain } from '../screens/ScreenMain';
 
 import { SplashScreen } from '../screens/SplashScreen';
@@ -16,6 +15,9 @@ import { BluetoothDeviceDiscoveryScreen } from '../screens/BluetoothDeviceDiscov
 import { CheckBackgroundTaskScreen } from '../screens/CheckBackgroundTaskScreen';
 import { TestApiSystemUv } from '../screens/TestApiSystemUV';
 import { ChangePasswordScreen } from '../screens/ChangePasswordScreen';
+
+import { SCREEN_APP } from '../constants/GlobalConstant'
+import {RequestPermissionScreen} from '../screens/RequestPermissionScreen';
 
 
 export type RootStackParams = {
@@ -34,11 +36,12 @@ export type RootStackParams = {
     BluetoothDeviceDiscoveryScreen: undefined,
     CheckBackgroundScreen: undefined,
     TestApiSystemUV: undefined,
+    RequestPermissionScreen:undefined,
 }
 
 const Stack = createStackNavigator<RootStackParams>();
-
-export const StackNavigator = ({ navigation }) => {
+interface Props extends StackScreenProps<any, any> { }
+export const StackNavigator = ({ navigation }: Props) => {
 
     return (
         <Stack.Navigator
@@ -46,40 +49,42 @@ export const StackNavigator = ({ navigation }) => {
             screenOptions={{
                 headerStyle: {
                     elevation: 0,
-                    shadowColor: 'transparent'
+                    shadowColor: 'transparent',
+                    backgroundColor: '#af73eb'
                 },
+                headerTintColor:'white',
+                headerTitleAlign: 'center',
                 cardStyle: {
                     backgroundColor: 'white'
                 }
             }}
         >
             <Stack.Screen name='ScreenMain' options={{ title: 'Main' }} component={ScreenMain} />
-            <Stack.Screen name='SplashScreen' options={{ title: 'Splash', headerShown: false }} component={SplashScreen} />
-            <Stack.Screen name='LoginScreen' options={{
-                title: 'Login',
-                headerShown: false,
-            }} component={LoginScreen} />
+            <Stack.Screen
+                name='SplashScreen'
+                options={{
+                    title: 'Splash',
+                    headerShown: false
+                }}
+                component={SplashScreen} />
+            <Stack.Screen
+                name='LoginScreen'
+                options={{
+                    title: 'Login',
+                    headerShown: false,
+                }}
+                component={LoginScreen} />
             <Stack.Screen name='RegisterScreen' options={{ title: 'register' }} component={RegisterScreen} />
             <Stack.Screen name='ValidatePinScreen' options={{ title: 'validatePin' }} component={ValidatePinScreen} />
             <Stack.Screen name='ChangePasswordScreen' options={{ title: 'changePassword' }} component={ChangePasswordScreen} />
             <Stack.Screen name='CounterScreen' options={{ title: 'counter' }} component={CounterBluetoothScreen} />
             <Stack.Screen name='UserInfoGeneralScreen' options={{ title: 'UserInfoGeneral' }} component={UserInfoGeneralScreen} />
-            <Stack.Screen name='ConfigCounterScreen' options={{
-                title: 'ConfigCounter',
-                headerLeft: (props) => (
-                    <HeaderBackButton
-                        {...props}
-                        style={{backgroundColor:'cyan'}}
-                        onPress={() => {
-                            alert('fadsfsa')
-                        }}
-                    />
-                )
-            }} component={ConfigCounterScreen} />
-            <Stack.Screen name='BluetoothDeviceConnectScreen' component={BluetoothDeviceConnectScreen} />
-            <Stack.Screen name='BluetoothDeviceDiscoveryScreen' component={BluetoothDeviceDiscoveryScreen} />
-            <Stack.Screen name='CheckBackgroundScreen' component={CheckBackgroundTaskScreen} />
-            <Stack.Screen name='TestApiSystemUV' component={TestApiSystemUv} />
+            <Stack.Screen name='ConfigCounterScreen' options={{ title: 'ConfigCounter' }} component={ConfigCounterScreen} />
+            <Stack.Screen name='BluetoothDeviceConnectScreen' options={{ title: 'Bluetooth Connect' }} component={BluetoothDeviceConnectScreen} />
+            <Stack.Screen name='BluetoothDeviceDiscoveryScreen' options={{ title: 'ConfigCounter' }} component={BluetoothDeviceDiscoveryScreen} />
+            <Stack.Screen name='CheckBackgroundScreen' options={{ title: 'ConfigCounter' }} component={CheckBackgroundTaskScreen} />
+            <Stack.Screen name='TestApiSystemUV' options={{ title: 'ConfigCounter' }} component={TestApiSystemUv} />
+            <Stack.Screen name='RequestPermissionScreen' options={{ title: 'RequestPermission'}} component={RequestPermissionScreen} />
         </Stack.Navigator>
     )
 }

@@ -34,6 +34,7 @@ export const ScreenMain = ({navigation}:Props) => {
             <Button title='BluetoothDiscovery' onPress={()=>onPressScreen('BluetoothDeviceDiscoveryScreen')} />
             <Button title='CheckBackground' onPress={()=>onPressScreen('CheckBackgroundScreen')} />
             <Button title='TestApiSystemUV' onPress={()=>onPressScreen('TestApiSystemUV')} />
+            <Button title='RequestPermissionScreen' onPress={()=>onPressScreen('RequestPermissionScreen')}/>
         </View>
     )
 }

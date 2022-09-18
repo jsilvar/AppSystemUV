@@ -1,5 +1,5 @@
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useRef, useEffect, useReducer } from 'react';
+import React, { useState, useRef, useEffect, useReducer, useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -25,6 +25,7 @@ import { LoaderGeneric } from '../components/generic/LoaderGeneric';
 import { SelectGeneric } from '../components/generic/SelectGeneric';
 import { TextInputGeneric } from '../components/generic/TextInputGeneric';
 import { ToastGeneric } from '../components/generic/ToastGeneric';
+import { HeaderLeft } from '../components/generic/HeaderLeft';
 
 interface Props extends StackScreenProps<any, any> { };
 
@@ -160,17 +161,25 @@ export const RegisterScreen = ({ navigation }: Props) => {
       let { code, data } = await requestPetition('post', USERS.CREATE, access_token, payloadUserDto)
       setVisibleLoader(false)
       console.log("data by register: ", data, ' code ', code)
-      if (code == CODE_HTTP.OK && data.role == ROLE_API.ADMIN)
-        navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
-      else if (code == CODE_HTTP.OK && data.role == ROLE_API.USER)
-        navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
+      if (code == CODE_HTTP.OK && data.role == ROLE_API.ADMIN) {
+        useToast(REGISTER_SCREEN.TOAST_SUCCESS, REGISTER_SCREEN.TOAST_REGISTER.TITLE, REGISTER_SCREEN.TOAST_REGISTER.MESSAGE)
+        setTimeout(() => {
+          navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
+        }, 3500);
+      }
+      else if (code == CODE_HTTP.OK && data.role == ROLE_API.USER) {
+        useToast(REGISTER_SCREEN.TOAST_SUCCESS, REGISTER_SCREEN.TOAST_REGISTER.TITLE, REGISTER_SCREEN.TOAST_REGISTER.MESSAGE)
+        setTimeout(() => {
+          navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
+        }, 3500);
+      }
       else if (code == CODE_HTTP.ERROR_SERVER)
         useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ERROR_SERVER.TITLE, REGISTER_SCREEN.TOAST_ERROR_SERVER.MESSAGE)
       else if (code == CODE_HTTP.CONFLICT)
         useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_NOT_REGISTER.TITLE, data.message)
-      else if (code == CODE_HTTP.NOT_AUTHORIZED){
-          useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
-          navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
+      else if (code == CODE_HTTP.NOT_AUTHORIZED) {
+        useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+        navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
       }
       else {
         useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ROLE_NON_EXISTENT.TITLE, REGISTER_SCREEN.TOAST_ROLE_NON_EXISTENT.MESSAGE)
@@ -184,9 +193,9 @@ export const RegisterScreen = ({ navigation }: Props) => {
         useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
       if (code == CODE_HTTP.FORBIDDEN)
         useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_IS_DENIED.TITLE, REGISTER_SCREEN.TOAST_ACCESS_IS_DENIED.MESSAGE)
-      if (code == CODE_HTTP.NOT_AUTHORIZED){
-          useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
-          navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
+      if (code == CODE_HTTP.NOT_AUTHORIZED) {
+        useToast(REGISTER_SCREEN.TOAST_ERROR, REGISTER_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.TITLE, CHANGE_PASSWORD_SCREEN.TOAST_ACCESS_TOKEN_EXPIRED.MESSAGE)
+        navigation.navigate(SCREEN_APP.LOGIN_SCREEN)
       }
     }
   }
