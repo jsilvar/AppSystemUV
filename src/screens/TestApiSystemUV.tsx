@@ -10,19 +10,15 @@ export const TestApiSystemUv = () => {
 
     const getTokenGeneric = async () => {
         let tokenGeneric=await tokenJWT()
-        await console.log(tokenGeneric)
     }
 
     const getTokenUser = async () => {
         let tokenUSer=await tokenJWTUser('ja.silvarojas@gmail.com','@Sena1234')
-        console.log(tokenUSer)
     }
 
     const getListUsers = async () => {
         let tokenUSer=await tokenJWTUser('ja.silvarojas@gmail.com','@Sena1234')
-        await console.log(tokenUSer)
         let data=await getPetition('get', USERS.LIST_USER, tokenUSer)
-        await console.log(data)
     }
 
     return (
@@ -31,7 +27,6 @@ export const TestApiSystemUv = () => {
             <Button title='getTokenGeneric' onPress={getTokenGeneric} />
             <Button title='getTokenUser' onPress={getTokenUser} />
             <Button title='listUsers' onPress={getListUsers} />
-
         </View>
     )
 }

@@ -42,7 +42,6 @@ export const PetitionAPI = () => {
         }
       })
       .catch((error) => {
-        console.log(error)
         return {
           code: error.response?.status,
           data: error.response?.data
@@ -80,8 +79,6 @@ export const PetitionAPI = () => {
   }
 
   const requestPetition = async (verbHttp: string, resource: string, token: any, payload?:any) => {
-    console.log('From petition api' + `${verbHttp} ${resource}`)
-    console.log(`${SERVER_PRODUCTION}${resource}`)
     let bearerAuth = 'Bearer ' + token;
     return await axios({
       headers: {

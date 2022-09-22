@@ -125,7 +125,6 @@ export const SelectGeneric = (props: Props) => {
             <SelectDropdown
                 data={props.data}
                 onSelect={(selectedItem, index) => {
-                    console.log(selectedItem, index)
                     setIdTextGeneric(selectedItem)
                 }}
                 buttonTextAfterSelection={(selectedItem, index) => {

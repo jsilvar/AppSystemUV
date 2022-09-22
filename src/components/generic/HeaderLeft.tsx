@@ -6,26 +6,22 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { SCREEN_APP } from '../../constants/GlobalConstant'
 
 interface Props extends StackScreenProps<any, any> { 
-    nameScreen:string
+    nameScreen:string,
+    backScreen:()=>void;
 }
 
-export const HeaderLeft = ({ navigation, nameScreen }: Props) => {
+export const HeaderLeft = ({ navigation, nameScreen, backScreen }: Props) => {
 
-    useEffect(() => {
-        console.log('from HeaderLeft: ', navigation)
-        console.log('nameScreen: ', nameScreen)
-    }, [])
-
-
-    const backScreen = (value: string) => {
-        navigation.navigate(value)
+    const pressButton = () => {
+        backScreen()
     }
 
     return (
         <View>
             <HeaderBackButton
-                style={{ backgroundColor: 'cyan' }}
-                onPress={() => backScreen(nameScreen)}
+                tintColor='white'
+                style={{ backgroundColor: 'white', color:'white' }}
+                onPress={() => pressButton()}
             />
         </View>
     )

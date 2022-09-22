@@ -11,6 +11,17 @@ export const GLOBAL_CONSTANT = {
     }
 }
 
+export const SCREEN_HEADER={
+    BLUETOOTH_DEVICE_CONNECT_SCREEN:'LISTA DISPOSITIVOS',
+    LOGIN_SCREEN:'INICIO DE SESIÓN',
+    REGISTER_SCREEN:'REGISTRO USUARIO',
+    CHANGE_PASSWORD_SCREEN:'CAMBIAR CONTRASEÑA',
+    CONFIG_COUNTER_SCREEN:'CONFIGURAR DESINFECCIÓN',
+    COUNTER_BLUETOOTH_SCREEN:'GENERAR DESINFECCIÓN',
+    USER_INFO_GENERAL_SCREEN:'INFORMACIÓN GENERAL',
+    VALIDATE_SCREEN:'VALIDAR PIN'  
+}
+
 export const SCREEN_APP={
     BLUETOOTH_DEVICE_CONNECT_SCREEN:'BluetoothDeviceConnectScreen',
     LOGIN_SCREEN:'LoginScreen',
@@ -64,6 +75,7 @@ export const LOGIN_SCREEN = {
 }
 
 export const REGISTER_SCREEN = {
+    TITLE:'INGRESE LA SIGUIENTE INFORMACIÓN',
     ID_NUMBER: 'NÚMERO DE IDENTIFICACIÓN:',
     EMAIL: 'CORREO ELECTRÓNICO:',
     FIRST_NAME: 'NOMBRE(S):',
@@ -135,6 +147,18 @@ export const BLUETOOTH_DEVICE_CONNECT_SCREEN = {
     BUTTON_NAME: 'SOLICITAR PIN',
     CHANGE_PASSWORD_BUTTON_NAME:'CAMBIAR CONTRASEÑA',
     REGISTER:'Regístrese aquí',
+    ALERT_CONNECT_DEVICE:{
+        TITLE:'¡Conectar dispositivo!',
+        MESSAGE:'Conecte el dispositivo para realizar la desinfección',
+        ACCEPT_BUTTON:'ACEPTAR',
+        CANCEL_BUTTON:'CANCELAR'
+    },
+    ALERT_LOGOUT:{
+        TITLE:'¡Cerrar sesión!',
+        MESSAGE:'¿Desea cerra la sesión actual?',
+        ACCEPT_BUTTON:'ACEPTAR',
+        CANCEL_BUTTON:'CANCELAR'
+    },
     MODAL:{
         TITLE:'ESCOJA UNA OPCIÓN',
         CLOSE_BUTTON:'CERRAR',
@@ -335,7 +359,7 @@ export const TABLE_DETAIL_DESINFECTION_USER={
 }
 
 export const COUNTER_DOWN={
-    TITLE:'TIEMPO DE DESINFECCIÓN UV',
+    TITLE:'PROCESO DE DESINFECCIÓN UV',
     FINISHED_TIME:'Tiempo finalizado',
     REMAINING_TIME:'Tiempo restante',
     WITHOUT_DATA_SENSOR:'Pendiente datos sensor',
@@ -354,16 +378,68 @@ export const COUNTER_DOWN={
         TITLE:'¡Registro faliido!',
         MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
     },
+    NOTIFICATION_THREAD_DISINFECTION_RUNNING:{
+        TITLE:'¡Ejecutando desinfección!',
+        MESSAGE:'En el aula: {0}, se esta ejecutando una desinfección en este momento.',
+    },
+    NOTIFICATION_THREAD_DISINFECTION_PENDING:{
+        TITLE:'¡Pendiente desinfección!',
+        MESSAGE:'Tiene una desinfección pendiente por ejecutar en el aula: {0}.',
+    },
     NOTIFICATION_LOCAL:{
         ID:'countDownSystemUV',
         NAME_CHANNEL:'Channel System UV',
         TITLE:'¡Tiempo Finalizado!',
-        MESSAGE:'Desinfección con UV realizada con satisfacción',
+        MESSAGE:'Desinfección con UV realizada exitosamente',
         SMALL_ICON:'ic-launcher',
         BIG_TEXT:'La limpieza del aula {0} con el tiempo {1}',
         COLOR:'purple',
         SOUND_NAME:'default'
-    }
+    },
+    TOAST_SEND_PIN:{
+        TITLE:'¡Pin enviado!',
+        MESSAGE:'El pin se envió al correo registrado.'
+    },
+    TOAST_REGISTER_DATA:{
+        TITLE:'¡Registro exitoso!',
+        MESSAGE:'El registro de la desinfección fue registrada con éxito.'
+    },
+    TOAST_CONFIRM_PIN:{
+        TITLE:'¡Pin confirmado!',
+        MESSAGE:'El pin se confirmo exitosamente.'
+    },
+    TOAST_CHANGE_PASSWORD:{
+        TITLE:'¡Contraseña modificada!',
+        MESSAGE:'Su contraseña se modificó satisfactoriamente.'
+    },
+    TOAST_ACCESS_TOKEN_EXPIRED:{
+        TITLE:'¡Expiró la sesión!',
+        MESSAGE:'Ingrese nuevamente desde el inicio de sesión.'
+    },
+    TOAST_BAD_CREDENTIALS:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Credenciales inválidas. Ingrese nuavemente su email y contraseña registrados.'
+    },
+    TOAST_ACCESS_IS_DENIED:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'No está autorizado para este recurso del backend.'
+    },
+    TOAST_ROLE_NON_EXISTENT:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Rol no registrado previamente. Contacte su administrador.'
+    },
+    TOAST_ERROR_SERVER:{
+        TITLE:'¡Error interno!',
+        MESSAGE:'Error interno en el backend. Contacte su administrador.'
+    },
+    TOAST_ERROR_NOT_FOUND:{
+        TITLE:'¡Error interno!',
+        MESSAGE:'Error del API no parametrizado. Contacte su administrador.'
+    },
+    TOAST_NOT_FOUND:{
+        TITLE:'¡Pin no encontrado!',
+        MESSAGE:'Constate el pin enviado al correo registrado.'
+    },
 }
 
 export const SELECT_OPTION={
@@ -450,6 +526,50 @@ export const CONFIG_COUNTER_SCREEN={
     TOAST_NOT_REGISTER:{
         TITLE:'¡Registro faliido!',
         MESSAGE:'Su registro genero un error. Intentelo nuevamente o comuníquese con su administrador.'
+    },
+    TOAST_SEND_PIN:{
+        TITLE:'¡Pin enviado!',
+        MESSAGE:'El pin se envió al correo registrado.'
+    },
+    TOAST_REGISTER_DATA:{
+        TITLE:'¡Registro exitoso!',
+        MESSAGE:'El registro de la desinfección fue registrada con éxito.'
+    },
+    TOAST_CONFIRM_PIN:{
+        TITLE:'¡Pin confirmado!',
+        MESSAGE:'El pin se confirmo exitosamente.'
+    },
+    TOAST_CHANGE_PASSWORD:{
+        TITLE:'¡Contraseña modificada!',
+        MESSAGE:'Su contraseña se modificó satisfactoriamente.'
+    },
+    TOAST_ACCESS_TOKEN_EXPIRED:{
+        TITLE:'¡Expiró la sesión!',
+        MESSAGE:'Ingrese nuevamente desde el inicio de sesión.'
+    },
+    TOAST_BAD_CREDENTIALS:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Credenciales inválidas. Ingrese nuavemente su email y contraseña registrados.'
+    },
+    TOAST_ACCESS_IS_DENIED:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'No está autorizado para este recurso del backend.'
+    },
+    TOAST_ROLE_NON_EXISTENT:{
+        TITLE:'¡Ingreso fallido!',
+        MESSAGE:'Rol no registrado previamente. Contacte su administrador.'
+    },
+    TOAST_ERROR_SERVER:{
+        TITLE:'¡Error interno!',
+        MESSAGE:'Error interno en el backend. Contacte su administrador.'
+    },
+    TOAST_ERROR_NOT_FOUND:{
+        TITLE:'¡Error interno!',
+        MESSAGE:'Error del API no parametrizado. Contacte su administrador.'
+    },
+    TOAST_NOT_FOUND:{
+        TITLE:'¡Pin no encontrado!',
+        MESSAGE:'Constate el pin enviado al correo registrado.'
     },
 }
 

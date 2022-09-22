@@ -1,47 +1,66 @@
 import React from "react";
 import { Button, PermissionsAndroid,Platform, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
 
+import {check, request, checkNotifications,PERMISSIONS, RESULTS} from 'react-native-permissions';
+
 const requestPermission = async () => {
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-      {
-        title: "Cool Photo App Camera Permission",
-        message:
-          "Cool Photo App needs access to your camera " +
-          "so you can take awesome pictures.",
-        buttonNeutral: "Ask Me Later",
-        buttonNegative: "Cancel",
-        buttonPositive: "OK"
-      }
-    );
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log("You can use the camera");
-    } else {
-      console.log("Camera permission denied");
+  console.log('request permission')
+
+  await request(PERMISSIONS.ANDROID.BLUETOOTH_CONNECT).then((result) => {
+    console.log('request: ', result)
+  });
+
+  await check(PERMISSIONS.ANDROID.BLUETOOTH_SCAN)
+  .then((result) => {
+    switch (result) {
+      case RESULTS.UNAVAILABLE:
+        console.log('This feature is not available (on this device / in this context)');
+        break;
+      case RESULTS.DENIED:
+        console.log('The permission has not been requested / is denied but requestable');
+        break;
+      case RESULTS.LIMITED:
+        console.log('The permission is limited: some actions are possible');
+        break;
+      case RESULTS.GRANTED:
+        console.log('The permission is granted');
+        break;
+      case RESULTS.BLOCKED:
+        console.log('The permission is denied and not requestable anymore');
+        break;
     }
-  } catch (err) {
-    console.warn(err);
-  }
+  })
+  .catch((error) => {
+    // …
+  });
+  
 };
 
 const checkPermission= async()=>{
   console.log('enter to validate permission')
-  const permissionCamera= await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.CAMERA)
-  // .then(response =>{ console.log('response',response)})
-  // .error(error => console.log('error',error))
-  console.log('permission camera', permissionCamera)
 
-  if(Platform.OS=="android"){
-    const permissionAndroid = await PermissionsAndroid.check('android.permission.CAMERA');
-    if(permissionAndroid != PermissionsAndroid.RESULTS.granted){
-      const reqPer = await PermissionsAndroid.request('android.permission.CAMERA');
-      if(reqPer != 'granted'){
-        console.log('permission doesnt granted')
-        return false;
-      }
+  let response = await check(PERMISSIONS.ANDROID.BLUETOOTH_CONNECT); // <-- always blocked
+    let isPermissionsGranted = false;
+
+    if (response === RESULTS.GRANTED) {
+        isPermissionsGranted = true;
+    } else if (response === RESULTS.DENIED) {
+        response = request(PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE, {
+            title: "FreeLine requires permission",
+            message: "FreeLine needs access to your location so you can see your position",
+            buttonPositive: "Ok",
+            buttonNegative: "Don't show my position",
+        });
+
+        if (response === RESULTS.GRANTED) {
+            isPermissionsGranted = true;
+        } else if (response === RESULTS.DENIED) {
+            //await openSettings();
+        }
     }
-  }
+
+    return isPermissionsGranted;
+
 }
 
 export const RequestPermissionScreen = () => (

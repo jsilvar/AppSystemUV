@@ -15,7 +15,6 @@ export const authReducer = (state: AuthState, action: AuthAction): AuthState => 
 
     switch (action.type) {
         case "signIn":
-            console.log('whats happend')
             return {
                 ...state,
                 isLoggedIn: true,

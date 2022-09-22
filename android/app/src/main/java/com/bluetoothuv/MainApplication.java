@@ -21,6 +21,7 @@ import com.react.rnspinkit.RNSpinkitPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.horcrux.svg.SvgPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import com.zoontek.rnpermissions.RNPermissionsPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -42,6 +43,7 @@ public class MainApplication extends Application implements ReactApplication {
           //packages.add(new AsyncStoragePackage());
           //packages.add(new BackgroundJobPackage());
           //packages.add(new BackgroundActionsPackage());
+          //packages.add(new RNPermissionsPackage());
           return packages;
         }
 

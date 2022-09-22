@@ -4,7 +4,7 @@ const MESSAGES_CONSTANT = {
     es: {
         idTextGeneric: 'El campo "{0}" debe ser un número válido.',
         timer:'Escoja al menos uno de los campos "{0}".',
-        password: 'El campo "{0}" debe tener al menos: una mayúscula, minúscula, un número y al menos un carater especial !@#$%&',
+        password: 'El campo "{0}" debe tener al menos: una mayúscula, minúscula, un número y al menos un carácter especial !@#$%&',
         number: 'El campo "{0}" debe ser un número válido.',
         numbers: 'El campo "{0}" debe ser un número válido.',
         email: 'El campo "{0}" debe ser un email válido.',

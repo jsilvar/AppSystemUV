@@ -2,7 +2,8 @@ import React, { useState, useEffect, useLayoutEffect, PropTypes } from 'react'
 import {
     View,
     Text,
-    Switch
+    Switch,
+    StyleSheet
 } from 'react-native'
 import styles from '../../styles/styles'
 import { TOAST } from '../../constants/GlobalConstant';
@@ -22,12 +23,10 @@ const EnabledBluetooth = (props: Props) => {
     const [isEnabled, setIsEnabled] = useState(props.isEnabled)
 
     useEffect(() => {
-        console.log('useEffect ENABLED',props.isEnabled)
         setIsEnabled(props.isEnabled)
     }, [props.isEnabled])
 
     useLayoutEffect(() => {
-        console.log('use Layout effect ENABLED',props.isEnabled)
         setIsEnabled(props.isEnabled)
     }, [props.isEnabled])
 
@@ -51,7 +50,7 @@ const EnabledBluetooth = (props: Props) => {
 
     return (
         <View style={styles.enableInfoWrapper}>
-            <Text style={{ fontSize: 14, color: "#000", paddingRight: 10 }}>
+            <Text style={{ fontSize: 14, color: "white"}}>
                 {isEnabled ? "ON" : "OFF"}
             </Text>
             <Switch onValueChange={toggleButton} value={isEnabled} />
@@ -59,5 +58,6 @@ const EnabledBluetooth = (props: Props) => {
     )
 
 }
+
 
 export default EnabledBluetooth;

@@ -13,7 +13,6 @@ export const CounterBluetoothScreen = ({navigation}:Props) => {
 
   useEffect(() => {
     createChannels()
-    console.log('navigation', navigation)
   }, [])
 
   const createChannels = () => {

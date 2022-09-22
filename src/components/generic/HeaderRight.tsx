@@ -7,25 +7,20 @@ import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 interface Props extends StackScreenProps<any, any> {
-    nameScreen: string
+    nameScreen: string;
+    forwardScreen:()=>void;
 }
 
-export const HeaderRight = ({ navigation, nameScreen }: Props) => {
+export const HeaderRight = ({ navigation, nameScreen, forwardScreen }: Props) => {
 
-    useEffect(() => {
-        console.log('from HeaderLeft: ', navigation)
-        console.log('nameScreen: ', nameScreen)
-    }, [])
-
-
-    const forwardScreen = (value: string) => {
-        navigation.navigate(value)
+    const pressButton = () => {
+        forwardScreen()
     }
 
     return (
         <View>
-            <TouchableOpacity onPress={()=>forwardScreen(nameScreen)}>
-                <IconAntDesign name="arrowright" solid size={25} color="black" />
+            <TouchableOpacity onPress={()=>pressButton()}>
+                <IconAntDesign name="arrowright" solid size={25} color="white" />
             </TouchableOpacity>
         </View>
     )

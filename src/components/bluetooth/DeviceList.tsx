@@ -29,7 +29,6 @@ export const DeviceList = (props: Props) => {
 
 
   const onPress = (item) => {
-    console.log('ID', item.id)
     setSelectedId(item.id)
     props.onDevicePressed(item.id);
   }

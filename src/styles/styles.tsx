@@ -21,9 +21,9 @@ const styles = StyleSheet.create({
     color: "#fff"
   },
   enableInfoWrapper: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
   },
   listContainer: {
     borderColor: "#ccc",

@@ -15,7 +15,6 @@ interface Props extends StackScreenProps<any, any> {
 export const ScreenMain = ({navigation}:Props) => {
 
     const onPressScreen=(e:any)=>{
-        console.log('onPressScreen: ',e)
         navigation.navigate(e)
     }
 

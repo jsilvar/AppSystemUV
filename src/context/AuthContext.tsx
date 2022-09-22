@@ -83,7 +83,6 @@ export const AuthProvider = ({ children }: any) => {
     }    
 
     const assignDeviceBluetooth=(deviceBluetooth:AuthState)=>{
-        console.log('from assign device',deviceBluetooth)
         dispatch({type:'assignDeviceBluetooth', payload:deviceBluetooth})
     }
 
