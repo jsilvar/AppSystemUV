@@ -10,7 +10,7 @@ const requestPermission = async () => {
     console.log('request: ', result)
   });
 
-  await check(PERMISSIONS.ANDROID.BLUETOOTH_SCAN)
+  await check(PERMISSIONS.ANDROID.BLUETOOTH_CONNECT)
   .then((result) => {
     switch (result) {
       case RESULTS.UNAVAILABLE:
@@ -45,7 +45,7 @@ const checkPermission= async()=>{
     if (response === RESULTS.GRANTED) {
         isPermissionsGranted = true;
     } else if (response === RESULTS.DENIED) {
-        response = request(PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE, {
+        response = request(PERMISSIONS.ANDROID.BLUETOOTH_CONNECT, {
             title: "FreeLine requires permission",
             message: "FreeLine needs access to your location so you can see your position",
             buttonPositive: "Ok",

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useReducer, useContext } from 'react';
-
+import { Platform, Alert } from 'react-native'
 //constants
 import { LOGIN_SCREEN, SCREEN_APP } from '../constants/GlobalConstant';
 import { USERS, CODE_HTTP, ROLE_API, ERROR_TOKEN } from '../constants/ApiResource'
@@ -8,8 +8,10 @@ import { PetitionAPI } from '../util/PetitionAPI'
 import { loginInitialState, LoginReducer } from '../reducer/LoginReducer';
 //components
 import { AuthContext } from '../context/AuthContext';
+import { check, request, checkNotifications, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 export const useLoginScreen = (navigation) => {
+    const [permissionGranted, setPermissionGranted] = useState(false)
     //visible toast and loader
     const [visibleLoader, setVisibleLoader] = useState(false)
     const [visibleToast, setVisibleToast] = useState(false)
@@ -26,7 +28,12 @@ export const useLoginScreen = (navigation) => {
     const { tokenJWTUser, requestPetition } = PetitionAPI()
     const [validateCallAPI, setValidateCallAPI] = useState(0)
     //context
-    const {assignTokenUser, assignUser}=useContext(AuthContext)
+    const { assignTokenUser, assignUser } = useContext(AuthContext)
+
+    useEffect(() => {
+        if (Platform.OS == 'android' && Platform.Version >= 32)
+            checkPermission()
+    }, [])
 
     useEffect(() => {
         if (loginState.email.validated && loginState.password.validated
@@ -51,6 +58,48 @@ export const useLoginScreen = (navigation) => {
         if (validateCallAPI == 1)
             callLoginAPI()
     }, [validateCallAPI])
+
+
+    const checkPermission = async () => {
+        let response = await check(PERMISSIONS.ANDROID.BLUETOOTH_CONNECT); // <-- always blocked
+        
+        if (response === RESULTS.GRANTED) {
+            setPermissionGranted(true)
+        } else if (response === RESULTS.DENIED) {
+            response = request(PERMISSIONS.ANDROID.BLUETOOTH_CONNECT, {
+                title: LOGIN_SCREEN.MESSAGE_PERMISSION.TITLE,
+                message: LOGIN_SCREEN.MESSAGE_PERMISSION.MESSAGE,
+                buttonPositive: LOGIN_SCREEN.MESSAGE_PERMISSION.BUTTON_POSSITIVE,
+                buttonNegative: LOGIN_SCREEN.MESSAGE_PERMISSION.BUTTON_NEGATIVE,
+            });
+            if (response === RESULTS.GRANTED) {
+                setPermissionGranted(true)
+            } else if (response === RESULTS.DENIED) {
+                useToast(LOGIN_SCREEN.TOAST_ERROR, LOGIN_SCREEN.TOAST_PERMISSION_DENIED.TITLE, LOGIN_SCREEN.TOAST_PERMISSION_DENIED.MESSAGE)
+            }
+        }
+    }
+
+    const alertPermissionEnabledBluetooth = () => {
+        Alert.alert(
+            LOGIN_SCREEN.ALERT_PERMISSION_BLUETOOTH.TITLE,
+            LOGIN_SCREEN.ALERT_PERMISSION_BLUETOOTH.MESSAGE,
+            [
+                {
+                    text: LOGIN_SCREEN.ALERT_PERMISSION_BLUETOOTH.CANCEL_BUTTON,
+                    style: "cancel",
+                    onPress: () => {
+                    }
+                },
+                {
+                    text: LOGIN_SCREEN.ALERT_PERMISSION_BLUETOOTH.ACCEPT_BUTTON,
+                    onPress: () => {
+                        checkPermission()
+                    }
+                }
+            ]
+        )
+    }
 
     //use toast
     const useToast = (type: string, title: string, message: string) => {
@@ -87,6 +136,13 @@ export const useLoginScreen = (navigation) => {
 
     //call login api
     const callLoginAPI = async () => {
+        if(!permissionGranted && Platform.OS == 'android' && Platform.Version>=32){
+            setTimeout(() => {
+                setValidateCallAPI(0)
+            }, 1000);
+            alertPermissionEnabledBluetooth()
+            return
+        }
 
         if (validateCallAPI != 1) {
             setTimeout(() => {
@@ -103,34 +159,34 @@ export const useLoginScreen = (navigation) => {
             if (code == CODE_HTTP.OK) {
                 //context
                 assignTokenUser(access_token)
-                
+
                 let { code, data } = await requestPetition('get', USERS.GET_USER_BY_EMAIL.replace('${email}', loginState.email.value), access_token)
                 setVisibleLoader(false)
-                
-                if (code == CODE_HTTP.OK && data.role == ROLE_API.ADMIN){
+
+                if (code == CODE_HTTP.OK && data.role == ROLE_API.ADMIN) {
                     //context
-                    let user={
-                        email:data.email,
-                        identificationNumber:data.identification_number,
-                        firstName:data.first_name,
-                        lastName:data.last_name,
-                        enabled:data.enabled,
-                        role:data.role,
+                    let user = {
+                        email: data.email,
+                        identificationNumber: data.identification_number,
+                        firstName: data.first_name,
+                        lastName: data.last_name,
+                        enabled: data.enabled,
+                        role: data.role,
                     }
                     assignUser(user)
                     //add logic according to role admin
                     navigation.navigate(SCREEN_APP.BLUETOOTH_DEVICE_CONNECT_SCREEN)
                     //navigation.navigate('ConfigCounterScreen')
                 }
-                else if (code == CODE_HTTP.OK && data.role == ROLE_API.USER){
+                else if (code == CODE_HTTP.OK && data.role == ROLE_API.USER) {
                     //context
-                    let user={
-                        email:data.email,
-                        identificationNumber:data.identification_number,
-                        firstName:data.first_name,
-                        lastName:data.last_name,
-                        enabled:data.enabled,
-                        role:data.role,
+                    let user = {
+                        email: data.email,
+                        identificationNumber: data.identification_number,
+                        firstName: data.first_name,
+                        lastName: data.last_name,
+                        enabled: data.enabled,
+                        role: data.role,
                     }
                     assignUser(user)
                     //add logic according to role user
@@ -150,14 +206,14 @@ export const useLoginScreen = (navigation) => {
                 if (code == CODE_HTTP.FORBIDDEN)
                     useToast(LOGIN_SCREEN.TOAST_ERROR, LOGIN_SCREEN.TOAST_ACCESS_IS_DENIED.TITLE, LOGIN_SCREEN.TOAST_ACCESS_IS_DENIED.MESSAGE)
             }
-            
+
             setTimeout(() => {
                 setValidateCallAPI(0)
             }, 1000);
         }
     }
 
-    return({
+    return ({
         visibleLoader,
         titleToast,
         messageToast,
